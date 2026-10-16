@@ -466,7 +466,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 
 <div class="footer">💡 Calculadora Personal de Gastos — datos guardados en tu navegador</div>
 
-<script type="module">
+<script>
 // ─── DATOS ────────────────────────────────────────────────────────────────────
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -1048,7 +1048,7 @@ function iniciarSync() {
   }, () => setSyncStatus('error'));
 }
 
-// ─── EXPONER FUNCIONES AL HTML (necesario para type="module" en iOS) ──────────
+// ─── EXPONER FUNCIONES AL HTML ────────────────────────────────────────────────
 window.agregarGasto      = agregarGasto;
 window.agregarIngreso    = agregarIngreso;
 window.eliminarGasto     = eliminarGasto;
@@ -1057,8 +1057,70 @@ window.guardarPresupuesto= guardarPresupuesto;
 window.switchView        = switchView;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-iniciarSync();
 renderAll();
+</script>
+
+<!-- Firebase compat — compatible con iOS Safari -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
+  authDomain: "mis-finanzas-85c47.firebaseapp.com",
+  projectId: "mis-finanzas-85c47",
+  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
+  messagingSenderId: "584441374984",
+  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db      = firebase.firestore();
+const DOC_REF = db.collection('usuarios').doc('miquel');
+let _syncBlocked = false;
+
+function setSyncStatus(estado) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (estado === 'ok')      { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
+  if (estado === 'saving')  { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
+  if (estado === 'error')   { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
+  if (estado === 'loading') { el.textContent = '🔄 Cargando...';  el.style.color = '#aaa'; }
+}
+
+function saveToCloud(d) {
+  try { localStorage.setItem('calculadora_gastos_v2', JSON.stringify(d)); } catch(e){}
+  setSyncStatus('saving');
+  _syncBlocked = true;
+  DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
+    .then(() => { setSyncStatus('ok'); setTimeout(() => { _syncBlocked = false; }, 1500); })
+    .catch(() => { setSyncStatus('error'); _syncBlocked = false; });
+}
+
+// Patch setMesData para subir a Firebase en cada cambio
+window._origSetMesData = window.setMesData;
+window.setMesData = function(m, a, mesData) {
+  try {
+    const raw = localStorage.getItem('calculadora_gastos_v2');
+    const d = raw ? JSON.parse(raw) : {};
+    const k = a + '-' + String(m+1).padStart(2,'0');
+    d[k] = mesData;
+    saveToCloud(d);
+  } catch(e) { setSyncStatus('error'); }
+};
+
+// Escuchar cambios remotos
+setSyncStatus('loading');
+DOC_REF.onSnapshot(snap => {
+  if (_syncBlocked) return;
+  if (snap.exists) {
+    try {
+      const remoteData = JSON.parse(snap.data().data);
+      try { localStorage.setItem('calculadora_gastos_v2', JSON.stringify(remoteData)); } catch(e){}
+      if (typeof renderAll === 'function') renderAll();
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  } else { setSyncStatus('ok'); }
+}, () => setSyncStatus('error'));
 </script>
 </body>
 </html>
