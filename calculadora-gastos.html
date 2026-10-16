@@ -527,7 +527,7 @@ function getMesData(m, a) {
 function setMesData(m, a, mesData) {
   const d = getData();
   d[claveMes(m, a)] = mesData;
-  saveData(d);
+  saveDataCloud(d);
 }
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
@@ -770,7 +770,9 @@ function eliminarIngreso(idx) {
 function guardarPresupuesto(key, val) {
   const md = getMesData(mesActual, anioActual);
   md.presupuesto[key] = parseFloat(val) || 0;
-  setMesData(mesActual, anioActual, md);
+  const d = getData();
+  d[claveMes(mesActual, anioActual)] = md;
+  saveDataCloud(d);
   renderBarras();
 }
 
@@ -1001,6 +1003,8 @@ const fbApp = initializeApp(firebaseConfig);
 const db    = getFirestore(fbApp);
 const DOC_REF = doc(db, 'usuarios', 'miquel');
 
+let _syncBlocked = false; // evitar bucle al recibir cambios remotos
+
 // Indicador de sincronización en el header
 function setSyncStatus(estado) {
   const el = document.getElementById('syncStatus');
@@ -1011,39 +1015,37 @@ function setSyncStatus(estado) {
   if (estado === 'loading') { el.textContent = '🔄 Cargando...';  el.style.color = '#aaa'; }
 }
 
-// Guardar en Firestore además de localStorage
-const _saveDataOrig = saveData;
+// Guardar local + Firestore
 async function saveDataCloud(d) {
-  _saveDataOrig(d); // siempre local primero
+  saveData(d); // guardar local siempre
   setSyncStatus('saving');
   try {
+    _syncBlocked = true;
     await setDoc(DOC_REF, { data: JSON.stringify(d), ts: Date.now() });
     setSyncStatus('ok');
+    setTimeout(() => { _syncBlocked = false; }, 1000);
   } catch(e) {
     setSyncStatus('error');
+    _syncBlocked = false;
   }
 }
-// Reemplazar saveData global
-window.saveData = saveDataCloud;
 
-// Escuchar cambios en tiempo real desde Firestore → actualiza todos los dispositivos
+// Escuchar cambios remotos en tiempo real
 function iniciarSync() {
   setSyncStatus('loading');
   onSnapshot(DOC_REF, (snap) => {
+    if (_syncBlocked) return;
     if (snap.exists()) {
       try {
         const remoteData = JSON.parse(snap.data().data);
-        // Guardar en local sin triggear subida (usar original)
-        _saveDataOrig(remoteData);
+        saveData(remoteData); // solo local, sin subir de nuevo
         renderAll();
         setSyncStatus('ok');
       } catch(e) { setSyncStatus('error'); }
     } else {
       setSyncStatus('ok');
     }
-  }, (err) => {
-    setSyncStatus('error');
-  });
+  }, () => setSyncStatus('error'));
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
