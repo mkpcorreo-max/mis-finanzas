@@ -987,7 +987,7 @@ function renderDashboard() {
 
 // ─── FIREBASE SYNC ────────────────────────────────────────────────────────────
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot }
+import { getFirestore, doc, setDoc, onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1047,6 +1047,14 @@ function iniciarSync() {
     }
   }, () => setSyncStatus('error'));
 }
+
+// ─── EXPONER FUNCIONES AL HTML (necesario para type="module" en iOS) ──────────
+window.agregarGasto      = agregarGasto;
+window.agregarIngreso    = agregarIngreso;
+window.eliminarGasto     = eliminarGasto;
+window.eliminarIngreso   = eliminarIngreso;
+window.guardarPresupuesto= guardarPresupuesto;
+window.switchView        = switchView;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 iniciarSync();
