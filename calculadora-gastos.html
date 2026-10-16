@@ -321,6 +321,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
        style="padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;
               text-decoration:none;border:2px solid rgba(255,255,255,.3);color:#fff">💼 Portfolio</a>
     <div class="header-badge" id="fechaHoy"></div>
+    <div id="syncStatus" style="font-size:12px;color:#aaa;margin-left:8px">🔄 Cargando...</div>
   </div>
 </div>
 
@@ -465,7 +466,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 
 <div class="footer">💡 Calculadora Personal de Gastos — datos guardados en tu navegador</div>
 
-<script>
+<script type="module">
 // ─── DATOS ────────────────────────────────────────────────────────────────────
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -982,7 +983,71 @@ function renderDashboard() {
   `;
 }
 
+// ─── FIREBASE SYNC ────────────────────────────────────────────────────────────
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
+  authDomain: "mis-finanzas-85c47.firebaseapp.com",
+  projectId: "mis-finanzas-85c47",
+  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
+  messagingSenderId: "584441374984",
+  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db    = getFirestore(fbApp);
+const DOC_REF = doc(db, 'usuarios', 'miquel');
+
+// Indicador de sincronización en el header
+function setSyncStatus(estado) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (estado === 'ok')      { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
+  if (estado === 'saving')  { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
+  if (estado === 'error')   { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
+  if (estado === 'loading') { el.textContent = '🔄 Cargando...';  el.style.color = '#aaa'; }
+}
+
+// Guardar en Firestore además de localStorage
+const _saveDataOrig = saveData;
+async function saveDataCloud(d) {
+  _saveDataOrig(d); // siempre local primero
+  setSyncStatus('saving');
+  try {
+    await setDoc(DOC_REF, { data: JSON.stringify(d), ts: Date.now() });
+    setSyncStatus('ok');
+  } catch(e) {
+    setSyncStatus('error');
+  }
+}
+// Reemplazar saveData global
+window.saveData = saveDataCloud;
+
+// Escuchar cambios en tiempo real desde Firestore → actualiza todos los dispositivos
+function iniciarSync() {
+  setSyncStatus('loading');
+  onSnapshot(DOC_REF, (snap) => {
+    if (snap.exists()) {
+      try {
+        const remoteData = JSON.parse(snap.data().data);
+        // Guardar en local sin triggear subida (usar original)
+        _saveDataOrig(remoteData);
+        renderAll();
+        setSyncStatus('ok');
+      } catch(e) { setSyncStatus('error'); }
+    } else {
+      setSyncStatus('ok');
+    }
+  }, (err) => {
+    setSyncStatus('error');
+  });
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
+iniciarSync();
 renderAll();
 </script>
 </body>
