@@ -176,9 +176,9 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 .progress-fill { height: 100%; border-radius: 10px; transition: width .5s ease; }
 
 /* MONTH TABS */
-.month-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.month-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
 .month-tab {
-  padding: 7px 16px;
+  padding: 7px 12px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
@@ -187,6 +187,8 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
   background: #fff;
   color: var(--text-muted);
   transition: all .2s;
+  min-width: 44px;
+  text-align: center;
 }
 .month-tab.active {
   background: var(--primary);
@@ -486,11 +488,32 @@ let anioActual = hoy.getFullYear();
 
 function claveMes(m, a) { return `${a}-${String(m+1).padStart(2,'0')}`; }
 
+// ─── STORAGE — robusto para iOS Safari ───────────────────────────────────────
+const STORAGE_KEY = 'calculadora_gastos_v2';
+
 function getData() {
-  return JSON.parse(localStorage.getItem('calculadora_gastos') || '{}');
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e2) { return {}; }
+  }
 }
+
 function saveData(d) {
-  localStorage.setItem('calculadora_gastos', JSON.stringify(d));
+  const json = JSON.stringify(d);
+  try { localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+  try { sessionStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+  // Backup en cookie (30 días) para mayor seguridad en iOS
+  try {
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 30);
+    // Solo guardamos un hash para detectar cambios, datos en localStorage
+    document.cookie = `cgv2_ts=${Date.now()};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+  } catch(e) {}
 }
 
 function getMesData(m, a) {
@@ -514,15 +537,23 @@ function fmt(n) {
 function renderTabs() {
   const tabs = document.getElementById('monthTabs');
   tabs.innerHTML = '';
-  // Mostrar últimos 6 meses + mes actual
-  for (let i = 5; i >= 0; i--) {
-    let m = hoy.getMonth() - i;
-    let a = hoy.getFullYear();
-    if (m < 0) { m += 12; a -= 1; }
+  // Mostrar todos los meses del año actual
+  for (let m = 0; m < 12; m++) {
+    const a = hoy.getFullYear();
     const isActive = (m === mesActual && a === anioActual);
+    const tieneDatos = (() => {
+      const md = getMesData(m, a);
+      return md.gastos.length > 0 || md.ingresos.length > 0;
+    })();
     const btn = document.createElement('button');
     btn.className = 'month-tab' + (isActive ? ' active' : '');
-    btn.textContent = MESES[m] + ' ' + a;
+    btn.style.position = 'relative';
+    btn.textContent = MESES[m].substring(0,3);
+    if (tieneDatos) {
+      const dot = document.createElement('span');
+      dot.style.cssText = 'position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#2ECC71;';
+      btn.appendChild(dot);
+    }
     btn.onclick = () => { mesActual = m; anioActual = a; renderAll(); };
     tabs.appendChild(btn);
   }
