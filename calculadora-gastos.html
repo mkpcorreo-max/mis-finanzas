@@ -204,7 +204,6 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 .presupuesto-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .presupuesto-row label { margin: 0; white-space: nowrap; min-width: 130px; }
 .presupuesto-row input { max-width: 120px; }
-.presupuesto-row .pct { font-size: 13px; font-weight: 700; min-width: 50px; text-align: right; }
 
 /* EMPTY STATE */
 .empty-state {
@@ -213,22 +212,17 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
   color: var(--text-muted);
 }
 .empty-state .icon { font-size: 48px; margin-bottom: 10px; }
-.empty-state p { font-size: 14px; }
 
-/* DIVIDER */
 .section-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
-/* TOTALES ROW */
 .totals-row td {
   font-weight: 700;
   background: #F8F9FF !important;
   border-top: 2px solid var(--border);
 }
 
-/* FOOTER */
 .footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px; }
 
-/* VIEW TABS */
 .view-tabs {
   display: flex; gap: 6px; margin-bottom: 24px;
   background: #fff; border-radius: 14px; padding: 6px;
@@ -240,9 +234,7 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
   color: var(--text-muted); background: transparent; transition: all .2s;
 }
 .view-tab.active { background: var(--primary); color: #fff; box-shadow: 0 3px 10px rgba(108,99,255,.3); }
-.view-tab:hover:not(.active) { background: #F0F2F5; color: var(--primary); }
 
-/* DASHBOARD */
 .dash-kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
 .dash-kpi {
   background: var(--card); border-radius: 14px; padding: 18px 20px;
@@ -260,7 +252,6 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 .dash-kpi.sal .dash-kpi-val { color: var(--primary); }
 .dash-kpi.mes .dash-kpi-val { color: var(--yellow); }
 
-/* DASH TABLA MESES */
 .dash-table { width: 100%; border-collapse: collapse; }
 .dash-table th {
   text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase;
@@ -268,7 +259,6 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
   border-bottom: 2px solid var(--border);
 }
 .dash-table td { padding: 12px 14px; font-size: 14px; border-bottom: 1px solid var(--border); }
-.dash-table tr:last-child td { border-bottom: none; }
 .dash-table tr:hover td { background: #F8F9FF; }
 .dash-table .td-mes  { font-weight: 700; }
 .dash-table .td-ing  { color: var(--green); font-weight: 700; }
@@ -278,19 +268,16 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 .dash-table .td-sal.neg { color: var(--red); }
 .dash-table .total-row td { font-weight: 900; background: #F8F9FF !important; border-top: 2px solid var(--border); }
 
-/* DASH CATEGORIAS */
 .dash-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .dash-cat-item { margin-bottom: 12px; }
 .dash-cat-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: 600; }
 .dash-mini-bar  { height: 8px; background: var(--border); border-radius: 8px; overflow: hidden; }
 .dash-mini-fill { height: 100%; border-radius: 8px; }
 
-/* CHART BARS */
 .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding: 0 4px; }
 .bar-wrap   { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
 .bar-col    { width: 100%; border-radius: 6px 6px 0 0; min-height: 2px; transition: height .4s; position: relative; }
 .bar-label  { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: center; }
-.bar-val    { font-size: 9px; color: var(--text-muted); }
 
 @media(max-width: 768px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
@@ -333,131 +320,112 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
     <button class="view-tab"        id="tabDash"  onclick="switchView('dashboard')">📊 Dashboard Anual</button>
   </div>
 
-  <!-- ═══════════════════ VISTA MES ═══════════════════ -->
+  <!-- VISTA MES -->
   <div id="viewMes">
+    <div class="month-tabs" id="monthTabs"></div>
 
-  <!-- MES SELECTOR -->
-  <div class="month-tabs" id="monthTabs"></div>
+    <div class="grid-3">
+      <div class="kpi-card green">
+        <div class="kpi-label">💵 Ingresos del mes</div>
+        <div class="kpi-value green" id="kpiIngresos">0,00 €</div>
+        <div class="kpi-sub">Ingresos registrados</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">💸 Total gastos</div>
+        <div class="kpi-value red" id="kpiGastos">0,00 €</div>
+        <div class="kpi-sub">Suma de todos los gastos</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">📈 Saldo disponible</div>
+        <div class="kpi-value purple" id="kpiSaldo">0,00 €</div>
+        <div class="kpi-sub">Ingresos − Gastos</div>
+      </div>
+    </div>
 
-  <!-- KPIs -->
-  <div class="grid-3">
-    <div class="kpi-card green">
-      <div class="kpi-label">💵 Ingresos del mes</div>
-      <div class="kpi-value green" id="kpiIngresos">0,00 €</div>
-      <div class="kpi-sub">Ingresos registrados</div>
-    </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">💸 Total gastos</div>
-      <div class="kpi-value red" id="kpiGastos">0,00 €</div>
-      <div class="kpi-sub">Suma de todos los gastos</div>
-    </div>
-    <div class="kpi-card purple">
-      <div class="kpi-label">📈 Saldo disponible</div>
-      <div class="kpi-value purple" id="kpiSaldo">0,00 €</div>
-      <div class="kpi-sub">Ingresos − Gastos</div>
+    <div class="grid-2">
+      <div>
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-title">➕ Añadir Gasto</div>
+          <div class="form-row-3">
+            <div>
+              <label>Descripción</label>
+              <input type="text" id="inputDesc" placeholder="Ej: Supermercado..." />
+            </div>
+            <div>
+              <label>Importe (€)</label>
+              <input type="number" id="inputImporte" placeholder="0,00" min="0" step="0.01" />
+            </div>
+            <div>
+              <label>Categoría</label>
+              <select id="inputCategoria">
+                <option value="vivienda">🏠 Vivienda</option>
+                <option value="alimentacion" selected>🛒 Alimentación</option>
+                <option value="transporte">🚗 Transporte</option>
+                <option value="salud">💊 Salud</option>
+                <option value="ocio">🎭 Ocio</option>
+                <option value="ropa">👗 Ropa</option>
+                <option value="educacion">📚 Educación</option>
+                <option value="ahorro">💰 Ahorro/Inversión</option>
+                <option value="otros">📦 Otros</option>
+              </select>
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn btn-primary" onclick="agregarGasto()">＋ Añadir</button>
+            </div>
+          </div>
+
+          <hr class="section-divider">
+          <div class="form-row">
+            <div>
+              <label>Fuente de ingreso</label>
+              <input type="text" id="inputIngDesc" placeholder="Ej: Salario..." />
+            </div>
+            <div>
+              <label>Importe (€)</label>
+              <input type="number" id="inputIngImporte" placeholder="0,00" min="0" step="0.01" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn btn-primary" style="background:#2ECC71" onclick="agregarIngreso()">＋ Ingreso</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📋 Movimientos del Mes</div>
+          <div id="tablaWrap">
+            <table class="gastos-table" id="tablaGastos">
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th>Categoría</th>
+                  <th>Importe</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="gastosTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-title">🎯 Presupuesto por Categoría</div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Define tu presupuesto mensual</p>
+          <div id="presupuestoForm"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📊 Gasto por Categoría</div>
+          <div id="barrasCategoria"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- MAIN GRID -->
-  <div class="grid-2">
-
-    <!-- COLUMNA IZQUIERDA -->
-    <div>
-
-      <!-- AÑADIR GASTO -->
-      <div class="card" style="margin-bottom:24px">
-        <div class="card-title">➕ Añadir Gasto</div>
-
-        <div class="form-row-3">
-          <div>
-            <label>Descripción</label>
-            <input type="text" id="inputDesc" placeholder="Ej: Supermercado..." />
-          </div>
-          <div>
-            <label>Importe (€)</label>
-            <input type="number" id="inputImporte" placeholder="0,00" min="0" step="0.01" />
-          </div>
-          <div>
-            <label>Categoría</label>
-            <select id="inputCategoria">
-              <option value="vivienda">🏠 Vivienda</option>
-              <option value="alimentacion" selected>🛒 Alimentación</option>
-              <option value="transporte">🚗 Transporte</option>
-              <option value="salud">💊 Salud</option>
-              <option value="ocio">🎭 Ocio</option>
-              <option value="ropa">👗 Ropa</option>
-              <option value="educacion">📚 Educación</option>
-              <option value="ahorro">💰 Ahorro/Inversión</option>
-              <option value="otros">📦 Otros</option>
-            </select>
-          </div>
-          <div>
-            <label>&nbsp;</label>
-            <button class="btn btn-primary" onclick="agregarGasto()">＋ Añadir</button>
-          </div>
-        </div>
-
-        <!-- INGRESOS -->
-        <hr class="section-divider">
-        <div class="form-row">
-          <div>
-            <label>Fuente de ingreso</label>
-            <input type="text" id="inputIngDesc" placeholder="Ej: Salario, freelance..." />
-          </div>
-          <div>
-            <label>Importe (€)</label>
-            <input type="number" id="inputIngImporte" placeholder="0,00" min="0" step="0.01" />
-          </div>
-          <div>
-            <label>&nbsp;</label>
-            <button class="btn btn-primary" style="background:#2ECC71" onclick="agregarIngreso()">＋ Ingreso</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- LISTA DE MOVIMIENTOS -->
-      <div class="card">
-        <div class="card-title">📋 Movimientos del Mes</div>
-        <div id="tablaWrap">
-          <table class="gastos-table" id="tablaGastos">
-            <thead>
-              <tr>
-                <th>Descripción</th>
-                <th>Categoría</th>
-                <th>Importe</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="gastosTbody"></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- COLUMNA DERECHA -->
-    <div>
-
-      <!-- PRESUPUESTO POR CATEGORÍA -->
-      <div class="card" style="margin-bottom:24px">
-        <div class="card-title">🎯 Presupuesto por Categoría</div>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Define tu presupuesto mensual por categoría</p>
-
-        <div id="presupuestoForm"></div>
-      </div>
-
-      <!-- PROGRESO POR CATEGORÍA -->
-      <div class="card">
-        <div class="card-title">📊 Gasto por Categoría</div>
-        <div id="barrasCategoria"></div>
-      </div>
-
-    </div>
-  </div>
-
-  </div> <!-- /viewMes -->
-
-  <!-- ═══════════════════ DASHBOARD ANUAL ═══════════════════ -->
+  <!-- DASHBOARD ANUAL -->
   <div id="viewDashboard" style="display:none">
     <div id="dashContent"></div>
   </div>
@@ -467,7 +435,6 @@ input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px 
 <div class="footer">💡 Calculadora Personal de Gastos — datos guardados en tu navegador</div>
 
 <script>
-// ─── DATOS ────────────────────────────────────────────────────────────────────
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -484,37 +451,22 @@ const CATEGORIAS = {
 };
 
 const hoy = new Date();
-let mesActual = hoy.getMonth(); // 0-11
+let mesActual = hoy.getMonth();
 let anioActual = hoy.getFullYear();
 
 function claveMes(m, a) { return `${a}-${String(m+1).padStart(2,'0')}`; }
 
-// ─── STORAGE — robusto para iOS Safari ───────────────────────────────────────
 const STORAGE_KEY = 'calculadora_gastos_v2';
 
 function getData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : {};
-  } catch(e) {
-    try {
-      const raw = sessionStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch(e2) { return {}; }
-  }
+  } catch(e) { return {}; }
 }
 
 function saveData(d) {
-  const json = JSON.stringify(d);
-  try { localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
-  try { sessionStorage.setItem(STORAGE_KEY, json); } catch(e) {}
-  // Backup en cookie (30 días) para mayor seguridad en iOS
-  try {
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 30);
-    // Solo guardamos un hash para detectar cambios, datos en localStorage
-    document.cookie = `cgv2_ts=${Date.now()};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
-  } catch(e) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e) {}
 }
 
 function getMesData(m, a) {
@@ -527,10 +479,13 @@ function getMesData(m, a) {
 function setMesData(m, a, mesData) {
   const d = getData();
   d[claveMes(m, a)] = mesData;
-  saveDataCloud(d);
+  if (typeof window.saveDataCloud === 'function') {
+    window.saveDataCloud(d);
+  } else {
+    saveData(d);
+  }
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────────────────
 function fmt(n) {
   return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
@@ -538,7 +493,6 @@ function fmt(n) {
 function renderTabs() {
   const tabs = document.getElementById('monthTabs');
   tabs.innerHTML = '';
-  // Mostrar todos los meses del año actual
   for (let m = 0; m < 12; m++) {
     const a = hoy.getFullYear();
     const isActive = (m === mesActual && a === anioActual);
@@ -594,7 +548,6 @@ function renderTabla() {
     return;
   }
 
-  // Primero ingresos, luego gastos
   md.ingresos.forEach((ing, idx) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -624,7 +577,6 @@ function renderTabla() {
     tbody.appendChild(tr);
   });
 
-  // Fila totales
   const totalGastos = md.gastos.reduce((s,g) => s + g.importe, 0);
   const totalIngresos = md.ingresos.reduce((s,i) => s + i.importe, 0);
   const trTot = document.createElement('tr');
@@ -715,7 +667,6 @@ function renderAll() {
   renderBarras();
 }
 
-// ─── ACCIONES ─────────────────────────────────────────────────────────────────
 function agregarGasto() {
   const desc = document.getElementById('inputDesc').value.trim();
   const importe = parseFloat(document.getElementById('inputImporte').value);
@@ -770,13 +721,10 @@ function eliminarIngreso(idx) {
 function guardarPresupuesto(key, val) {
   const md = getMesData(mesActual, anioActual);
   md.presupuesto[key] = parseFloat(val) || 0;
-  const d = getData();
-  d[claveMes(mesActual, anioActual)] = md;
-  saveDataCloud(d);
+  setMesData(mesActual, anioActual, md);
   renderBarras();
 }
 
-// ─── ENTER KEY ────────────────────────────────────────────────────────────────
 document.getElementById('inputImporte').addEventListener('keydown', e => {
   if (e.key === 'Enter') agregarGasto();
 });
@@ -784,11 +732,9 @@ document.getElementById('inputIngImporte').addEventListener('keydown', e => {
   if (e.key === 'Enter') agregarIngreso();
 });
 
-// ─── FECHA HEADER ─────────────────────────────────────────────────────────────
 document.getElementById('fechaHoy').textContent =
   hoy.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-// ─── SWITCH VIEW ──────────────────────────────────────────────────────────────
 function switchView(v) {
   document.getElementById('viewMes').style.display       = v === 'mes'       ? '' : 'none';
   document.getElementById('viewDashboard').style.display = v === 'dashboard' ? '' : 'none';
@@ -797,12 +743,12 @@ function switchView(v) {
   if (v === 'dashboard') renderDashboard();
 }
 
-// ─── DASHBOARD ANUAL ──────────────────────────────────────────────────────────
-function getDashboardData(anio) {
+function renderDashboard() {
+  const anio = hoy.getFullYear();
   const d = getData();
-  const filas = [];
   let totalIng = 0, totalGas = 0, mesesConDatos = 0;
   const acumCat = {};
+  const filas = [];
 
   for (let m = 0; m < 12; m++) {
     const k = claveMes(m, anio);
@@ -822,61 +768,20 @@ function getDashboardData(anio) {
   const promIng = mesesConDatos > 0 ? totalIng / mesesConDatos : 0;
   const promGas = mesesConDatos > 0 ? totalGas / mesesConDatos : 0;
   const promSal = promIng - promGas;
-
-  return { filas, totalIng, totalGas, totalSal: totalIng - totalGas,
-           promIng, promGas, promSal, mesesConDatos, acumCat };
-}
-
-function renderDashboard() {
-  const anio = hoy.getFullYear();
-  const { filas, totalIng, totalGas, totalSal,
-          promIng, promGas, promSal, mesesConDatos, acumCat } = getDashboardData(anio);
-
+  const totalSal = totalIng - totalGas;
   const maxGas = Math.max(...filas.map(f => Math.max(f.gas, f.ing)), 1);
-  const totalCat = Object.values(acumCat).reduce((a,b) => a+b, 0);
 
   const barsHtml = filas.map(f => {
     const hGas = f.gas > 0 ? Math.max((f.gas / maxGas) * 110, 4) : 0;
     const hIng = f.ing > 0 ? Math.max((f.ing / maxGas) * 110, 4) : 0;
-    const mes3 = f.mes.substring(0,3);
     return `
       <div class="bar-wrap">
         <div style="display:flex;gap:2px;align-items:flex-end;height:110px">
-          <div class="bar-col" style="height:${hIng}px;background:#2ECC71;opacity:.7;width:10px;border-radius:4px 4px 0 0" title="Ingresos: ${fmt(f.ing)}"></div>
-          <div class="bar-col" style="height:${hGas}px;background:#E74C3C;opacity:.8;width:10px;border-radius:4px 4px 0 0" title="Gastos: ${fmt(f.gas)}"></div>
+          <div class="bar-col" style="height:${hIng}px;background:#2ECC71;opacity:.7;width:10px;border-radius:4px 4px 0 0"></div>
+          <div class="bar-col" style="height:${hGas}px;background:#E74C3C;opacity:.8;width:10px;border-radius:4px 4px 0 0"></div>
         </div>
-        <div class="bar-label">${mes3}</div>
+        <div class="bar-label">${f.mes.substring(0,3)}</div>
       </div>`;
-  }).join('');
-
-  const catHtml = Object.entries(CATEGORIAS)
-    .filter(([k]) => acumCat[k] > 0)
-    .sort((a, b) => (acumCat[b[0]] || 0) - (acumCat[a[0]] || 0))
-    .map(([key, cat]) => {
-      const val = acumCat[key] || 0;
-      const pct = totalCat > 0 ? ((val / totalCat) * 100).toFixed(1) : 0;
-      return `
-        <div class="dash-cat-item">
-          <div class="dash-cat-label">
-            <span>${cat.emoji} ${cat.label}</span>
-            <span style="color:${cat.color}">${fmt(val)} <small style="color:var(--text-muted)">(${pct}%)</small></span>
-          </div>
-          <div class="dash-mini-bar">
-            <div class="dash-mini-fill" style="width:${pct}%;background:${cat.color}"></div>
-          </div>
-        </div>`;
-    }).join('');
-
-  const filasHtml = filas.map(f => {
-    const tieneData = f.ing > 0 || f.gas > 0;
-    const esActual  = f.m === hoy.getMonth();
-    return `<tr style="${!tieneData ? 'opacity:.4' : ''}${esActual ? ';background:#F8F9FF' : ''}">
-      <td class="td-mes">${f.mes}${esActual ? ' <span style="font-size:10px;background:var(--primary);color:#fff;padding:2px 7px;border-radius:10px;margin-left:4px">Actual</span>' : ''}</td>
-      <td class="td-ing">${tieneData ? '+' + fmt(f.ing) : '—'}</td>
-      <td class="td-gas">${tieneData ? '−' + fmt(f.gas) : '—'}</td>
-      <td class="td-sal ${f.sal >= 0 ? 'pos' : 'neg'}">${tieneData ? (f.sal >= 0 ? '+' : '') + fmt(f.sal) : '—'}</td>
-      <td>${tieneData ? `<div style="height:7px;background:var(--border);border-radius:4px;min-width:80px;overflow:hidden"><div style="height:100%;width:${Math.min((f.gas/maxGas)*100,100).toFixed(0)}%;background:var(--red);border-radius:4px"></div></div>` : ''}</td>
-    </tr>`;
   }).join('');
 
   document.getElementById('dashContent').innerHTML = `
@@ -889,166 +794,28 @@ function renderDashboard() {
       <div class="dash-kpi ing">
         <div class="dash-kpi-label">💵 Total ingresos</div>
         <div class="dash-kpi-val">${fmt(totalIng)}</div>
-        <div class="dash-kpi-sub">Acumulado ${anio}</div>
       </div>
       <div class="dash-kpi gas">
         <div class="dash-kpi-label">💸 Total gastos</div>
         <div class="dash-kpi-val">${fmt(totalGas)}</div>
-        <div class="dash-kpi-sub">Acumulado ${anio}</div>
       </div>
       <div class="dash-kpi sal">
         <div class="dash-kpi-label">📈 Saldo acumulado</div>
-        <div class="dash-kpi-val" style="color:${totalSal >= 0 ? 'var(--green)' : 'var(--red)'}">${totalSal >= 0 ? '+' : ''}${fmt(totalSal)}</div>
-        <div class="dash-kpi-sub">Ingresos − Gastos total</div>
+        <div class="dash-kpi-val" style="color:${totalSal >= 0 ? 'var(--green)' : 'var(--red)'}">${fmt(totalSal)}</div>
       </div>
       <div class="dash-kpi mes">
         <div class="dash-kpi-label">📅 Gasto promedio/mes</div>
         <div class="dash-kpi-val">${fmt(promGas)}</div>
-        <div class="dash-kpi-sub">Ingreso prom: ${fmt(promIng)}</div>
-      </div>
-    </div>
-
-    <div class="grid-2" style="margin-bottom:24px">
-      <div class="card">
-        <div class="card-title">📊 Evolución mensual</div>
-        <div class="bar-chart">${barsHtml}</div>
-        <div style="display:flex;gap:20px;justify-content:center;font-size:12px;margin-top:12px">
-          <span><span style="display:inline-block;width:10px;height:10px;background:#2ECC71;border-radius:2px;margin-right:5px;opacity:.8"></span>Ingresos</span>
-          <span><span style="display:inline-block;width:10px;height:10px;background:#E74C3C;border-radius:2px;margin-right:5px;opacity:.8"></span>Gastos</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📐 Promedios mensuales</div>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px">
-              <span>💵 Ingreso medio</span><strong style="color:var(--green)">${fmt(promIng)}</strong>
-            </div>
-            <div style="height:8px;background:var(--border);border-radius:8px;overflow:hidden">
-              <div style="height:100%;width:100%;background:var(--green);border-radius:8px;opacity:.7"></div>
-            </div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px">
-              <span>💸 Gasto medio</span><strong style="color:var(--red)">${fmt(promGas)}</strong>
-            </div>
-            <div style="height:8px;background:var(--border);border-radius:8px;overflow:hidden">
-              <div style="height:100%;width:${promIng > 0 ? Math.min((promGas/promIng)*100,100).toFixed(0) : 0}%;background:var(--red);border-radius:8px;opacity:.8"></div>
-            </div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px">
-              <span>📈 Ahorro medio</span><strong style="color:${promSal >= 0 ? 'var(--primary)' : 'var(--red)'}">${promSal >= 0 ? '+' : ''}${fmt(promSal)}</strong>
-            </div>
-            <div style="height:8px;background:var(--border);border-radius:8px;overflow:hidden">
-              <div style="height:100%;width:${promIng > 0 ? Math.min(Math.abs(promSal/promIng)*100,100).toFixed(0) : 0}%;background:${promSal >= 0 ? 'var(--primary)' : 'var(--red)'};border-radius:8px;opacity:.8"></div>
-            </div>
-          </div>
-          <hr style="border:none;border-top:1px solid var(--border)">
-          <div style="background:#F8F9FF;border-radius:10px;padding:14px">
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">💡 Tasa de ahorro media</div>
-            <div style="font-size:26px;font-weight:900;color:var(--primary)">${promIng > 0 ? ((promSal / promIng) * 100).toFixed(1) : 0}%</div>
-            <div style="font-size:11px;color:var(--text-muted)">de tus ingresos ahorras de media</div>
-          </div>
-        </div>
       </div>
     </div>
 
     <div class="card" style="margin-bottom:24px">
-      <div class="card-title">📋 Desglose por mes</div>
-      <div style="overflow-x:auto">
-        <table class="dash-table">
-          <thead>
-            <tr><th>Mes</th><th>Ingresos</th><th>Gastos</th><th>Saldo</th><th>Nivel gasto</th></tr>
-          </thead>
-          <tbody>
-            ${filasHtml}
-            <tr class="total-row">
-              <td>TOTAL ${anio}</td>
-              <td style="color:var(--green)">+${fmt(totalIng)}</td>
-              <td style="color:var(--red)">−${fmt(totalGas)}</td>
-              <td style="color:${totalSal >= 0 ? 'var(--green)' : 'var(--red)'}">${totalSal >= 0 ? '+' : ''}${fmt(totalSal)}</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">🏷️ Gastos acumulados por categoría (${anio})</div>
-      ${totalCat > 0
-        ? `<div class="dash-cat-grid">${catHtml}</div>`
-        : `<div class="empty-state"><div class="icon">📭</div><p>Sin gastos registrados en ${anio}</p></div>`}
+      <div class="card-title">📊 Evolución mensual</div>
+      <div class="bar-chart">${barsHtml}</div>
     </div>
   `;
 }
 
-// ─── FIREBASE SYNC ────────────────────────────────────────────────────────────
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, onSnapshot }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
-  authDomain: "mis-finanzas-85c47.firebaseapp.com",
-  projectId: "mis-finanzas-85c47",
-  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
-  messagingSenderId: "584441374984",
-  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
-};
-
-const fbApp = initializeApp(firebaseConfig);
-const db    = getFirestore(fbApp);
-const DOC_REF = doc(db, 'usuarios', 'miquel');
-
-let _syncBlocked = false; // evitar bucle al recibir cambios remotos
-
-// Indicador de sincronización en el header
-function setSyncStatus(estado) {
-  const el = document.getElementById('syncStatus');
-  if (!el) return;
-  if (estado === 'ok')      { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
-  if (estado === 'saving')  { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
-  if (estado === 'error')   { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
-  if (estado === 'loading') { el.textContent = '🔄 Cargando...';  el.style.color = '#aaa'; }
-}
-
-// Guardar local + Firestore
-async function saveDataCloud(d) {
-  saveData(d); // guardar local siempre
-  setSyncStatus('saving');
-  try {
-    _syncBlocked = true;
-    await setDoc(DOC_REF, { data: JSON.stringify(d), ts: Date.now() });
-    setSyncStatus('ok');
-    setTimeout(() => { _syncBlocked = false; }, 1000);
-  } catch(e) {
-    setSyncStatus('error');
-    _syncBlocked = false;
-  }
-}
-
-// Escuchar cambios remotos en tiempo real
-function iniciarSync() {
-  setSyncStatus('loading');
-  onSnapshot(DOC_REF, (snap) => {
-    if (_syncBlocked) return;
-    if (snap.exists()) {
-      try {
-        const remoteData = JSON.parse(snap.data().data);
-        saveData(remoteData); // solo local, sin subir de nuevo
-        renderAll();
-        setSyncStatus('ok');
-      } catch(e) { setSyncStatus('error'); }
-    } else {
-      setSyncStatus('ok');
-    }
-  }, () => setSyncStatus('error'));
-}
-
-// ─── EXPONER FUNCIONES AL HTML ────────────────────────────────────────────────
 window.agregarGasto      = agregarGasto;
 window.agregarIngreso    = agregarIngreso;
 window.eliminarGasto     = eliminarGasto;
@@ -1056,11 +823,10 @@ window.eliminarIngreso   = eliminarIngreso;
 window.guardarPresupuesto= guardarPresupuesto;
 window.switchView        = switchView;
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
 renderAll();
 </script>
 
-<!-- Firebase compat — compatible con iOS Safari -->
+<!-- FIREBASE SDK (COMPAT) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
@@ -1087,40 +853,41 @@ function setSyncStatus(estado) {
   if (estado === 'loading') { el.textContent = '🔄 Cargando...';  el.style.color = '#aaa'; }
 }
 
-function saveToCloud(d) {
-  try { localStorage.setItem('calculadora_gastos_v2', JSON.stringify(d)); } catch(e){}
+function saveDataCloud(d) {
+  saveData(d);
   setSyncStatus('saving');
   _syncBlocked = true;
   DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
-    .then(() => { setSyncStatus('ok'); setTimeout(() => { _syncBlocked = false; }, 1500); })
-    .catch(() => { setSyncStatus('error'); _syncBlocked = false; });
+    .then(() => {
+      setSyncStatus('ok');
+      setTimeout(() => { _syncBlocked = false; }, 1200);
+    })
+    .catch((err) => {
+      console.error("Firebase Sync Error:", err);
+      setSyncStatus('error');
+      _syncBlocked = false;
+    });
 }
 
-// Patch setMesData para subir a Firebase en cada cambio
-window._origSetMesData = window.setMesData;
-window.setMesData = function(m, a, mesData) {
-  try {
-    const raw = localStorage.getItem('calculadora_gastos_v2');
-    const d = raw ? JSON.parse(raw) : {};
-    const k = a + '-' + String(m+1).padStart(2,'0');
-    d[k] = mesData;
-    saveToCloud(d);
-  } catch(e) { setSyncStatus('error'); }
-};
+window.saveDataCloud = saveDataCloud;
 
-// Escuchar cambios remotos
 setSyncStatus('loading');
 DOC_REF.onSnapshot(snap => {
   if (_syncBlocked) return;
   if (snap.exists) {
     try {
       const remoteData = JSON.parse(snap.data().data);
-      try { localStorage.setItem('calculadora_gastos_v2', JSON.stringify(remoteData)); } catch(e){}
+      saveData(remoteData);
       if (typeof renderAll === 'function') renderAll();
       setSyncStatus('ok');
     } catch(e) { setSyncStatus('error'); }
-  } else { setSyncStatus('ok'); }
-}, () => setSyncStatus('error'));
+  } else {
+    setSyncStatus('ok');
+  }
+}, (err) => {
+  console.error("Snapshot error:", err);
+  setSyncStatus('error');
+});
 </script>
 </body>
 </html>
