@@ -207,6 +207,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
     <p>Informe Maestro · Estrategia & Posiciones en Vivo</p>
   </div>
   <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Índice</a>
     <a href="calculadora-gastos.html" class="nav-link">💰 Gastos</a>
     <a href="simulador-inversion.html" class="nav-link">📈 Simulador</a>
     <a href="portfolio.html" class="nav-link active">💼 Portfolio</a>
@@ -897,45 +898,3 @@ renderAll();
 const firebaseConfig = {
   apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
   authDomain: "mis-finanzas-85c47.firebaseapp.com",
-  projectId: "mis-finanzas-85c47",
-  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
-  messagingSenderId: "584441374984",
-  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const DOC_REF = db.collection('usuarios').doc('miquel_portfolio');
-let _syncBlocked = false;
-
-function setSyncStatus(estado) {
-  const el = document.getElementById('syncStatus');
-  if (!el) return;
-  if (estado === 'ok') { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
-  if (estado === 'saving') { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
-  if (estado === 'error') { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
-}
-
-function saveDataCloud(d) {
-  saveDataLocal(d);
-  setSyncStatus('saving');
-  _syncBlocked = true;
-  DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
-    .then(() => { setSyncStatus('ok'); setTimeout(() => { _syncBlocked = false; }, 1000); })
-    .catch(() => { setSyncStatus('error'); _syncBlocked = false; });
-}
-window.saveDataCloud = saveDataCloud;
-
-DOC_REF.onSnapshot(snap => {
-  if (_syncBlocked) return;
-  if (snap.exists) {
-    try {
-      const remoteData = JSON.parse(snap.data().data);
-      saveDataLocal(remoteData);
-      if (typeof renderAll === 'function') renderAll();
-      setSyncStatus('ok');
-    } catch(e) { setSyncStatus('error'); }
-  }
-}, () => { setSyncStatus('error'); });
-</script>
-</body>
-</html>
