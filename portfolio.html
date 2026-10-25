@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Portfolio de Inversión — Panel Inteligente</title>
+<title>Portfolio de Inversión — Informe Maestro</title>
 <style>
 :root {
   --primary: #6C63FF;
@@ -32,7 +32,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 /* HEADER */
 .header {
   background:linear-gradient(135deg,#0F172A 0%,#1E293B 60%,#0F172A 100%);
-  color:#fff; padding:20px 32px;
+  color:#fff; padding:22px 32px;
   display:flex; align-items:center; justify-content:space-between;
   box-shadow:0 4px 24px rgba(0,0,0,.3);
 }
@@ -47,17 +47,17 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .nav-link.active { background:var(--primary); border-color:var(--primary); }
 
 /* LAYOUT */
-.container { max-width:1200px; margin:0 auto; padding:24px 20px; }
+.container { max-width:1250px; margin:0 auto; padding:24px 20px; }
 
 /* CARDS */
 .card {
   background:var(--card); border-radius:16px;
-  padding:20px; box-shadow:0 2px 16px rgba(0,0,0,.05); margin-bottom:20px;
+  padding:22px; box-shadow:0 2px 16px rgba(0,0,0,.05); margin-bottom:20px;
 }
 .card-title {
   font-size:12px; font-weight:800; text-transform:uppercase;
   letter-spacing:1.2px; color:var(--text-muted);
-  margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;
 }
 
 /* KPI STRIP */
@@ -114,7 +114,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .activos-table tr:last-child td { border-bottom:none; }
 .activos-table tr:hover td { background:#F8FAFF; }
 .activo-nombre { font-weight:700; font-size:14px; }
-.activo-ticker { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.activo-ticker { font-size:11px; color:var(--text-muted); margin-top:2px; font-family:monospace; }
 .activo-plat   { font-size:10px; padding:2px 8px; border-radius:8px; font-weight:700; display:inline-block; margin-top:3px; }
 .plat-myinvestor { background:#EDE9FE; color:#6C63FF; }
 .plat-trade      { background:#D1FAE5; color:#065F46; }
@@ -123,7 +123,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .cat-rv      { background:#DBEAFE; color:#1D4ED8; }
 .cat-oro     { background:#FEF3C7; color:#D97706; }
 .cat-liquid  { background:#D1FAE5; color:#065F46; }
-.valor-actual { font-size:16px; font-weight:900; }
+.valor-actual { font-size:15px; font-weight:900; }
 .rentab-pct   { font-size:12px; font-weight:700; padding:3px 8px; border-radius:8px; }
 .rentab-pos   { background:var(--green-lt); color:var(--green); }
 .rentab-neg   { background:var(--red-lt); color:var(--red); }
@@ -143,16 +143,12 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .ley-name { flex:1; }
 .ley-pct  { font-weight:700; }
 
-/* PLATAFORMAS */
-.plat-card { border-radius:12px; padding:16px; border:1px solid var(--border); display:flex; flex-direction:column; gap:8px; background:#FAFAFA; }
-.plat-header { display:flex; align-items:center; gap:10px; }
-.plat-logo   { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-.plat-nombre { font-size:14px; font-weight:800; }
-.plat-tipo   { font-size:11px; color:var(--text-muted); }
-.plat-total  { font-size:20px; font-weight:900; }
-.plat-sub    { font-size:11px; color:var(--text-muted); }
-.plat-bar    { height:5px; background:var(--border); border-radius:6px; overflow:hidden; margin-top:2px; }
-.plat-bar-fill { height:100%; border-radius:6px; }
+/* ESTRATEGIA CARD */
+.estrategia-box {
+  background:linear-gradient(135deg,#EDE9FE,#F5F3FF);
+  border:1px solid #C4B5FD; border-radius:14px; padding:20px;
+  font-size:13px; line-height:1.7; color:#4C1D95;
+}
 
 /* MODAL */
 .modal-overlay {
@@ -163,7 +159,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .modal-overlay.open { display:flex; }
 .modal {
   background:#fff; border-radius:20px; padding:26px;
-  width:100%; max-width:580px; box-shadow:0 20px 60px rgba(0,0,0,.25);
+  width:100%; max-width:700px; box-shadow:0 20px 60px rgba(0,0,0,.25);
   position: relative; max-height: 90vh; overflow-y: auto;
 }
 .modal-close { position: absolute; top: 18px; right: 18px; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
@@ -179,9 +175,10 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .btn-cancel  { background:#F1F5F9; color:var(--text-muted); }
 .btn-secondary { background:#EDE9FE; color:var(--primary); }
 .btn-danger  { background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; }
+.btn-sm { padding:6px 12px; font-size:11px; border-radius:8px; }
 
 /* REGISTRO DCA */
-.dca-registro { display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; padding-right:4px; }
+.dca-registro { display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; padding-right:4px; }
 .dca-aport-row {
   display:flex; align-items:center; justify-content:space-between;
   padding:10px 14px; border-radius:10px; border:1.5px solid var(--border); background:#FAFAFA;
@@ -191,7 +188,6 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .dca-aport-importe { font-size:14px; font-weight:900; }
 .dca-aport-importe.ejecutado { color:var(--green); }
 .dca-aport-importe.pendiente { color:var(--text-muted); }
-.btn-sm { padding:6px 12px; font-size:11px; border-radius:8px; }
 
 @media(max-width:900px) {
   .kpi-strip { grid-template-columns:repeat(3,1fr); }
@@ -208,7 +204,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 <div class="header">
   <div>
     <h1>💼 Portfolio de Inversión</h1>
-    <p>Estrategia DCA Automática & Gestión Inteligente</p>
+    <p>Informe Maestro · Estrategia & Posiciones en Vivo</p>
   </div>
   <div class="nav-links">
     <a href="calculadora-gastos.html" class="nav-link">💰 Gastos</a>
@@ -220,7 +216,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 
 <div class="container">
 
-  <!-- DCA HERO + ESTRATEGIA INTEGRADA -->
+  <!-- HERO & DCA PROGRESS -->
   <div class="dca-hero">
     <div>
       <div class="dca-title">🎯 Plan DCA Táctico en Curso</div>
@@ -246,12 +242,12 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
     </div>
   </div>
 
-  <!-- KPIs -->
+  <!-- KPIS -->
   <div class="kpi-strip">
     <div class="kpi k1">
       <div class="kpi-label">💼 Valor total cartera</div>
       <div class="kpi-val" id="kpiTotal">—</div>
-      <div class="kpi-sub">Con emergencia</div>
+      <div class="kpi-sub">Con fondo emergencia</div>
     </div>
     <div class="kpi k2">
       <div class="kpi-label">💵 Capital invertido</div>
@@ -275,671 +271,8 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
     </div>
   </div>
 
-  <div class="grid-2" style="margin-bottom:20px">
-    <!-- DISTRIBUCIÓN DONUT -->
-    <div class="card">
-      <div class="card-title">
-        <span>🥧 Distribución Objetivo</span>
-        <span style="font-size:11px;color:var(--primary);cursor:pointer" onclick="abrirModalGestionActivos()">⚙️ Configurar fondos</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:20px">
-        <div class="donut-wrap">
-          <canvas id="donutCanvas" width="160" height="160"></canvas>
-          <div class="donut-center">
-            <div class="donut-center-val" id="dca_mens_estimado">2.000€</div>
-            <div class="donut-center-label">/ mes DCA</div>
-          </div>
-        </div>
-        <div class="leyenda" id="donutLeyenda"></div>
-      </div>
-    </div>
-
-    <!-- PLATAFORMAS -->
-    <div class="card">
-      <div class="card-title">🏦 Por plataforma</div>
-      <div style="display:flex;flex-direction:column;gap:10px" id="plataformasWrap"></div>
-    </div>
-  </div>
-
-  <!-- TABLA ACTIVOS -->
+  <!-- TABLA DE POSICIONES MAESTRA -->
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">
-      <span>📋 Posiciones actuales y distribución automática</span>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-secondary btn-sm" onclick="exportarBackupJSON()">📥 Backup</button>
-        <button class="btn btn-secondary btn-sm" onclick="abrirModalGestionActivos()">➕ Añadir / Editar Fondo</button>
-        <button class="btn btn-primary btn-sm" onclick="abrirModalActualizar()">✏️ Actualizar saldos</button>
-      </div>
-    </div>
-    <div style="overflow-x:auto">
-      <table class="activos-table" id="activosTable">
-        <thead>
-          <tr>
-            <th>Activo</th>
-            <th>Categoría</th>
-            <th>Plataforma</th>
-            <th>Peso % (Auto)</th>
-            <th>Aportado</th>
-            <th>Valor actual</th>
-            <th>Rentab. %</th>
-            <th>DCA €/mes</th>
-          </tr>
-        </thead>
-        <tbody id="activosTbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- REGISTRO DCA -->
-  <div class="card">
-    <div class="card-title">📅 Calendario de aportaciones mensuales DCA</div>
-    <div class="dca-registro" id="dcaRegistro"></div>
-  </div>
-
-</div>
-
-<!-- MODAL GESTIÓN DE ACTIVOS (AÑADIR, EDITAR, ELIMINAR Y REPARTO AUTOMÁTICO) -->
-<div class="modal-overlay" id="modalGestionActivos">
-  <div class="modal" style="max-width: 720px;">
-    <button class="modal-close" onclick="cerrarModal('modalGestionActivos')">✕</button>
-    <h3>⚙️ Gestión de Fondos y Activos</h3>
-    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Los porcentajes se distribuyen automáticamente de forma equitativa entre todos tus fondos activos. Puedes añadir nuevos fondos, editarlos o eliminarlos al instante.</p>
-    
-    <div id="listaActivosConfig" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8F9FF;border-radius:10px;margin-bottom:20px">
-      <button class="btn btn-secondary btn-sm" onclick="agregarNuevoActivoConfig()">➕ Añadir nuevo fondo</button>
-      <div id="repartoAutoInfo" style="font-size:12px;font-weight:700;color:var(--primary)">✨ Reparto 100% automático activo</div>
-    </div>
-
-    <div class="modal-btns">
-      <button class="btn btn-cancel" onclick="cerrarModal('modalGestionActivos')">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarConfiguracionActivos()">💾 Guardar y actualizar cartera</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL ESTRATEGIA -->
-<div class="modal-overlay" id="modalEstrategia">
-  <div class="modal">
-    <button class="modal-close" onclick="cerrarModal('modalEstrategia')">✕</button>
-    <h3>🎯 Configurar Estrategia DCA</h3>
-    <div class="modal-field">
-      <label>Capital total a desplegar (€)</label>
-      <input type="number" id="estrInputCapital" value="20000" min="0" step="1000" />
-    </div>
-    <div class="modal-field">
-      <label>Plazo de despliegue (meses)</label>
-      <select id="estrInputPlazo">
-        <option value="6">6 meses</option>
-        <option value="10" selected>10 meses</option>
-        <option value="12">12 meses</option>
-        <option value="18">18 meses</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <label>Mes de inicio</label>
-      <input type="text" id="estrInputInicio" value="Nov 2026" />
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-cancel" onclick="cerrarModal('modalEstrategia')">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarEstrategia()">💾 Guardar Estrategia</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL ACTUALIZAR VALORES -->
-<div class="modal-overlay" id="modalActualizar">
-  <div class="modal">
-    <button class="modal-close" onclick="cerrarModal('modalActualizar')">✕</button>
-    <h3>✏️ Actualizar saldos reales</h3>
-    <div id="modalActivosForms"></div>
-    <div class="modal-btns">
-      <button class="btn btn-cancel" onclick="cerrarModal('modalActualizar')">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarValores()">💾 Guardar saldos</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL APORTACIÓN DCA -->
-<div class="modal-overlay" id="modalAportacion">
-  <div class="modal">
-    <button class="modal-close" onclick="cerrarModal('modalAportacion')">✕</button>
-    <h3>➕ Registrar aportación mensual</h3>
-    <div class="modal-field">
-      <label>Mes</label>
-      <select id="aportMes"></select>
-    </div>
-    <div class="modal-field">
-      <label>Importe ejecutado (€)</label>
-      <input type="number" id="aportImporte" value="2000" min="0" step="100" />
-    </div>
-    <div class="modal-field">
-      <label>Nota (opcional)</label>
-      <input type="text" id="aportNota" placeholder="Ej: ejecutado vía transferencia" />
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-cancel" onclick="cerrarModal('modalAportacion')">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarAportacion()">✅ Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const DEFAULT_ACTIVOS = [
-  { id: 'sp500', nombre: 'Fidelity S&P 500 Index Fund', ticker: 'IE00BYX5NX33', emoji: '🇺🇸', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#6C63FF', posicionInicial: 2500, esLiquidez: false },
-  { id: 'europa', nombre: 'Vanguard European Stock Index', ticker: 'IE00B945VV12', emoji: '🇪🇺', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#3B82F6', posicionInicial: 1800, esLiquidez: false },
-  { id: 'india', nombre: 'Franklin India Fund Class A', ticker: 'LU0231205187', emoji: '🇮🇳', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#F97316', posicionInicial: 0, esLiquidez: false },
-  { id: 'china', nombre: 'Franklin FTSE China Index Fund', ticker: 'IE00BHZRR150', emoji: '🇨🇳', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#EF4444', posicionInicial: 0, esLiquidez: false },
-  { id: 'oro', nombre: 'iShares Physical Gold ETC', ticker: 'IE00B4ND3602', emoji: '🥇', categoria: 'oro', catLabel: 'Oro / Refugio', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#F59E0B', posicionInicial: 0, esLiquidez: false },
-  { id: 'liquidez_mi', nombre: 'Efectivo Remunerado / Groupama', ticker: 'Monetario', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#10B981', posicionInicial: 3500, esLiquidez: true },
-  { id: 'liquidez_tr', name: 'Efectivo Remunerado Trade Republic', nombre: 'Efectivo Trade Republic', ticker: '2,5% TAE', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'trade', platLabel: 'Trade Republic', color: '#34D399', posicionInicial: 2600, esLiquidez: true }
-];
-
-const DCA_MESES = ['Nov 2026','Dic 2026','Ene 2027','Feb 2027','Mar 2027','Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027','Sep 2027','Oct 2027'];
-
-function getData() {
-  try { return JSON.parse(localStorage.getItem('portfolio_data') || '{}'); }
-  catch(e) { return {}; }
-}
-
-function saveDataLocal(d) {
-  try { localStorage.setItem('portfolio_data', JSON.stringify(d)); } catch(e){}
-}
-
-function saveData(d) {
-  saveDataLocal(d);
-  if (typeof window.saveDataCloud === 'function') window.saveDataCloud(d);
-}
-
-function getActivos() {
-  const d = getData();
-  if (!d.activosList || !Array.isArray(d.activosList)) {
-    d.activosList = DEFAULT_ACTIVOS;
-    saveDataLocal(d);
-  }
-  // Cálculo automático de pesos para activos DCA
-  const dcaAssets = d.activosList.filter(a => !a.esLiquidez);
-  if (dcaAssets.length > 0) {
-    const pesoEquitativo = parseFloat((100 / dcaAssets.length).toFixed(2));
-    dcaAssets.forEach(a => a.pctObjetivo = pesoEquitativo);
-  }
-  return d.activosList;
-}
-
-function getEstrategia() {
-  const d = getData();
-  if (!d.estrategia) {
-    d.estrategia = { capitalTotal: 20000, plazoMeses: 10, inicioMes: 'Nov 2026' };
-    saveDataLocal(d);
-  }
-  return d.estrategia;
-}
-
-function getPortfolio() {
-  const d = getData();
-  if (!d.portfolio) d.portfolio = {};
-  getActivos().forEach(a => {
-    if (!d.portfolio[a.id]) {
-      d.portfolio[a.id] = { valorActual: a.posicionInicial || 0, totalAportado: a.posicionInicial || 0 };
-    }
-  });
-  return d.portfolio;
-}
-
-function getAportaciones() {
-  const d = getData();
-  if (!d.aportaciones) { d.aportaciones = []; saveDataLocal(d); }
-  return d.aportaciones;
-}
-
-function fmt(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
-function fmtK(n) { return Math.abs(n) >= 1000 ? (n/1000).toLocaleString('es-ES',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' K€' : fmt(n); }
-
-function renderDCA() {
-  const aports = getAportaciones();
-  const est = getEstrategia();
-  const ejecutados = aports.filter(a => a.ejecutado).length;
-  const totalAportado = aports.filter(a => a.ejecutado).reduce((s,a) => s + a.importe, 0);
-  const pct = Math.min((totalAportado / est.capitalTotal) * 100, 100);
-
-  document.getElementById('dcaBarFill').style.width = pct + '%';
-  document.getElementById('dcaBigPct').textContent = pct.toFixed(0) + '%';
-  document.getElementById('dcaAportadoLabel').textContent = fmtK(totalAportado) + ' aportados';
-  document.getElementById('dcaObjetivoLabel').textContent = `Objetivo: ${fmtK(est.capitalTotal)}`;
-  document.getElementById('estr_disp').textContent = est.capitalTotal.toLocaleString('es-ES');
-  document.getElementById('estr_meses').textContent = est.plazoMeses;
-  document.getElementById('estr_fecha').textContent = est.inicioMes;
-
-  const wrap = document.getElementById('dcaMonths');
-  wrap.innerHTML = '';
-  DCA_MESES.slice(0, est.plazoMeses).forEach((mes, i) => {
-    const aport = aports.find(a => a.mes === mes);
-    const ejecutado = aport && aport.ejecutado;
-    const esActual  = i === ejecutados && ejecutados < est.plazoMeses;
-    const div = document.createElement('div');
-    div.className = 'dca-month-dot ' + (ejecutado ? 'done' : esActual ? 'active' : 'pending');
-    div.textContent = i + 1;
-    div.onclick = () => { if (!ejecutado) { document.getElementById('aportMes').value = mes; abrirModalAportacion(); } };
-    wrap.appendChild(div);
-  });
-
-  renderRegistroDCA(aports, ejecutados);
-}
-
-function renderRegistroDCA(aports, ejecutados) {
-  const wrap = document.getElementById('dcaRegistro');
-  wrap.innerHTML = '';
-  const est = getEstrategia();
-  const mensImporte = est.capitalTotal / est.plazoMeses;
-  
-  DCA_MESES.slice(0, est.plazoMeses).forEach((mes, i) => {
-    const aport = aports.find(a => a.mes === mes);
-    const ejecutado = aport && aport.ejecutado;
-    const div = document.createElement('div');
-    div.className = 'dca-aport-row ' + (ejecutado ? 'ejecutado' : '');
-    div.innerHTML = `
-      <div>
-        <div class="dca-aport-mes">${i+1}. ${mes}</div>
-        ${aport && aport.nota ? `<div style="font-size:11px;color:var(--text-muted)">${aport.nota}</div>` : ''}
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="dca-aport-importe ${ejecutado ? 'ejecutado' : 'pendiente'}">
-          ${ejecutado ? '+' + fmt(aport.importe) : fmt(mensImporte) + ' previsto'}
-        </span>
-        ${ejecutado ? `<button class="btn btn-danger btn-sm" onclick="borrarAportacion('${mes}')">🗑️</button>` : `<button class="btn btn-primary btn-sm" onclick="abrirModalAportacionMes('${mes}')">Registrar</button>`}
-      </div>
-    `;
-    wrap.appendChild(div);
-  });
-}
-
-function borrarAportacion(mes) {
-  if (!confirm(`¿Eliminar registro de ${mes}?`)) return;
-  const d = getData();
-  d.aportaciones = d.aportaciones.filter(a => a.mes !== mes);
-  saveData(d);
-  renderAll();
-}
-
-function renderKPIs() {
-  const p = getPortfolio();
-  let totalValor = 0, totalAportado = 0, totalLiquidez = 0;
-
-  getActivos().forEach(a => {
-    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
-    totalValor += pos.valorActual;
-    totalAportado += pos.totalAportado;
-    if (a.esLiquidez) totalLiquidez += pos.valorActual;
-  });
-
-  const ganancia = totalValor - totalAportado;
-  const rentabPct = totalAportado > 0 ? (ganancia / totalAportado) * 100 : 0;
-
-  document.getElementById('kpiTotal').textContent = fmtK(totalValor + 15000);
-  document.getElementById('kpiInvertido').textContent = fmtK(totalAportado);
-  document.getElementById('kpiRentab').textContent = (rentabPct >= 0 ? '+' : '') + rentabPct.toFixed(2) + '%';
-  document.getElementById('kpiRentab').style.color = rentabPct >= 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('kpiRentabEur').textContent = (ganancia >= 0 ? '+' : '') + fmtK(ganancia);
-  document.getElementById('kpiLiquidez').textContent = fmtK(totalLiquidez);
-}
-
-function renderTabla() {
-  const p = getPortfolio();
-  const est = getEstrategia();
-  const mensGlobal = est.capitalTotal / est.plazoMeses;
-  const activos = getActivos();
-  document.getElementById('dca_mens_estimado').textContent = fmtK(mensGlobal);
-
-  const tbody = document.getElementById('activosTbody');
-  tbody.innerHTML = '';
-
-  let totAportado = 0, totValor = 0;
-
-  activos.forEach(a => {
-    const dcaMensual = a.esLiquidez ? 0 : (a.pctObjetivo / 100) * mensGlobal;
-    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
-    const ganancia = pos.valorActual - pos.totalAportado;
-    const rentPct = pos.totalAportado > 0 ? (ganancia / pos.totalAportado) * 100 : 0;
-    totAportado += pos.totalAportado;
-    totValor += pos.valorActual;
-
-    const rentClass = rentPct > 0.5 ? 'rentab-pos' : rentPct < -0.5 ? 'rentab-neg' : 'rentab-neu';
-    const rentStr = pos.totalAportado > 0 ? `<span class="rentab-pct ${rentClass}">${rentPct >= 0 ? '+' : ''}${rentPct.toFixed(2)}%</span>` : '—';
-    const platClass = a.plataforma === 'myinvestor' ? 'plat-myinvestor' : a.plataforma === 'trade' ? 'plat-trade' : 'plat-bankinter';
-    const catClass = a.categoria === 'rv' ? 'cat-rv' : a.categoria === 'oro' ? 'cat-oro' : 'cat-liquid';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>
-        <div class="activo-nombre">${a.emoji || '💼'} ${a.nombre}</div>
-        <div class="activo-ticker">${a.ticker || ''}</div>
-      </td>
-      <td><span class="badge-categoria ${catClass}">${a.catLabel}</span></td>
-      <td><span class="activo-plat ${platClass}">${a.platLabel}</span></td>
-      <td style="font-weight:700">${!a.esLiquidez ? a.pctObjetivo + '%' : '—'}</td>
-      <td style="font-weight:600">${pos.totalAportado > 0 ? fmtK(pos.totalAportado) : '—'}</td>
-      <td><span class="valor-actual">${pos.valorActual > 0 ? fmtK(pos.valorActual) : '—'}</span></td>
-      <td>${rentStr}</td>
-      <td>${!a.esLiquidez ? `<strong style="color:var(--primary)">${fmt(dcaMensual)}</strong>` : '—'}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  const totGanancia = totValor - totAportado;
-  const totRent = totAportado > 0 ? (totGanancia / totAportado) * 100 : 0;
-  const tr = document.createElement('tr');
-  tr.style.cssText = 'font-weight:900;background:#F8F9FF';
-  tr.innerHTML = `
-    <td colspan="4">TOTAL CARTERA (sin emergencia)</td>
-    <td>${fmtK(totAportado)}</td>
-    <td style="color:var(--primary)">${fmtK(totValor)}</td>
-    <td><span class="rentab-pct ${totRent >= 0 ? 'rentab-pos' : 'rentab-neg'}">${totRent >= 0 ? '+' : ''}${totRent.toFixed(2)}%</span></td>
-    <td style="color:var(--primary)">${fmtK(mensGlobal)}</td>
-  `;
-  tbody.appendChild(tr);
-}
-
-function renderDonut() {
-  const canvas = document.getElementById('donutCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, 160, 160);
-
-  const activos = getActivos();
-  const dcaAssets = activos.filter(a => !a.esLiquidez);
-  let startAngle = -Math.PI / 2;
-
-  dcaAssets.forEach(a => {
-    const angle = (a.pctObjetivo / 100) * 2 * Math.PI;
-    ctx.beginPath();
-    ctx.moveTo(80, 80);
-    ctx.arc(80, 80, 70, startAngle, startAngle + angle);
-    ctx.closePath();
-    ctx.fillStyle = a.color || '#6C63FF';
-    ctx.fill();
-    startAngle += angle;
-  });
-
-  ctx.beginPath();
-  ctx.arc(80, 80, 44, 0, 2 * Math.PI);
-  ctx.fillStyle = '#fff';
-  ctx.fill();
-
-  const leyDiv = document.getElementById('donutLeyenda');
-  leyDiv.innerHTML = '';
-  dcaAssets.forEach(a => {
-    const div = document.createElement('div');
-    div.className = 'ley-item';
-    div.innerHTML = `
-      <div class="ley-dot" style="background:${a.color || '#6C63FF'}"></div>
-      <span class="ley-name">${a.emoji || '💼'} ${a.nombre.split(' ')[0]}</span>
-      <span class="ley-pct" style="color:${a.color || '#6C63FF'}">${a.pctObjetivo}%</span>
-    `;
-    leyDiv.appendChild(div);
-  });
-}
-
-function renderPlataformas() {
-  const p = getPortfolio();
-  const plats = {
-    myinvestor: { nombre: 'MyInvestor', emoji: '🟣', color: '#6C63FF', total: 0, tipos: 'Fondos · Oro · Liquidez' },
-    trade:      { nombre: 'Trade Republic', emoji: '🟢', color: '#10B981', total: 0, tipos: 'Efectivo 2,5%' },
-    bankinter:  { nombre: 'Bankinter', emoji: '🟠', color: '#F97316', total: 15000, tipos: 'Fondo emergencia 3%' }
-  };
-
-  getActivos().forEach(a => {
-    const pos = p[a.id] || { valorActual: 0 };
-    if (plats[a.plataforma]) plats[a.plataforma].total += pos.valorActual;
-  });
-
-  const totalGen = Object.values(plats).reduce((s, pl) => s + pl.total, 0);
-  const wrap = document.getElementById('plataformasWrap');
-  wrap.innerHTML = '';
-
-  Object.entries(plats).forEach(([k, pl]) => {
-    const pct = totalGen > 0 ? (pl.total / totalGen) * 100 : 0;
-    const div = document.createElement('div');
-    div.className = 'plat-card';
-    div.innerHTML = `
-      <div class="plat-header">
-        <div class="plat-logo" style="background:${pl.color}20">${pl.emoji}</div>
-        <div>
-          <div class="plat-nombre">${pl.nombre}</div>
-          <div class="plat-tipo">${pl.tipos}</div>
-        </div>
-      </div>
-      <div>
-        <div class="plat-total" style="color:${pl.color}">${fmtK(pl.total)}</div>
-        <div class="plat-sub">${pct.toFixed(1)}% del total</div>
-        <div class="plat-bar"><div class="plat-bar-fill" style="width:${pct}%;background:${pl.color}"></div></div>
-      </div>
-    `;
-    wrap.appendChild(div);
-  });
-}
-
-// MODAL GESTIÓN DE ACTIVOS (AÑADIR / ELIMINAR CON REPARTO AUTOMÁTICO)
-function abrirModalGestionActivos() {
-  const activos = getActivos();
-  const container = document.getElementById('listaActivosConfig');
-  container.innerHTML = '';
-
-  activos.forEach((a, idx) => {
-    const div = document.createElement('div');
-    div.style.cssText = 'display:grid;grid-template-columns:30px 1fr 110px 100px 40px;gap:8px;align-items:center;background:#FAFAFA;padding:8px;border-radius:8px;border:1px solid var(--border)';
-    div.innerHTML = `
-      <input type="text" value="${a.emoji || '💼'}" id="cfg_emoji_${idx}" style="text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px" />
-      <input type="text" value="${a.nombre}" id="cfg_nombre_${idx}" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
-      <select id="cfg_plat_${idx}" style="padding:6px;border:1px solid var(--border);border-radius:6px">
-        <option value="myinvestor" ${a.plataforma==='myinvestor'?'selected':''}>MyInvestor</option>
-        <option value="trade" ${a.plataforma==='trade'?'selected':''}>Trade Rep.</option>
-      </select>
-      <span style="font-size:12px;font-weight:700;text-align:center">${a.esLiquidez ? 'Liquidez' : 'Automático'}</span>
-      <button class="btn btn-danger btn-sm" onclick="eliminarActivoConfig(${idx})">🗑️</button>
-    `;
-    container.appendChild(div);
-  });
-
-  document.getElementById('modalGestionActivos').classList.add('open');
-}
-
-function agregarNuevoActivoConfig() {
-  const activos = getActivos();
-  activos.push({
-    id: 'activo_' + Date.now(),
-    nombre: 'Nuevo Fondo / Activo',
-    ticker: 'ISIN0000',
-    emoji: '📈',
-    categoria: 'rv',
-    catLabel: 'Renta Variable',
-    plataforma: 'myinvestor',
-    platLabel: 'MyInvestor',
-    color: '#6C63FF',
-    posicionInicial: 0,
-    esLiquidez: false
-  });
-  saveDataLocal({ ...getData(), activosList: activos });
-  abrirModalGestionActivos();
-}
-
-function eliminarActivoConfig(idx) {
-  const activos = getActivos();
-  if (activos.length <= 1) { alert('Debe haber al menos un activo.'); return; }
-  activos.splice(idx, 1);
-  saveDataLocal({ ...getData(), activosList: activos });
-  abrirModalGestionActivos();
-}
-
-function guardarConfiguracionActivos() {
-  const activos = getActivos();
-  activos.forEach((a, idx) => {
-    a.emoji = document.getElementById(`cfg_emoji_${idx}`).value.trim() || '💼';
-    a.nombre = document.getElementById(`cfg_nombre_${idx}`).value.trim() || 'Fondo';
-    a.plataforma = document.getElementById(`cfg_plat_${idx}`).value;
-    a.platLabel = a.plataforma === 'myinvestor' ? 'MyInvestor' : 'Trade Republic';
-  });
-
-  const d = getData();
-  d.activosList = activos;
-  saveData(d);
-  cerrarModal('modalGestionActivos');
-  renderAll();
-}
-
-function abrirModalEstrategia() {
-  const est = getEstrategia();
-  document.getElementById('estrInputCapital').value = est.capitalTotal;
-  document.getElementById('estrInputPlazo').value = est.plazoMeses;
-  document.getElementById('estrInputInicio').value = est.inicioMes;
-  document.getElementById('modalEstrategia').classList.add('open');
-}
-
-function guardarEstrategia() {
-  const cap = parseFloat(document.getElementById('estrInputCapital').value) || 20000;
-  const plz = parseInt(document.getElementById('estrInputPlazo').value) || 10;
-  const ini = document.getElementById('estrInputInicio').value.trim() || 'Nov 2026';
-
-  const d = getData();
-  d.estrategia = { capitalTotal: cap, plazoMeses: plz, inicioMes: ini };
-  saveData(d);
-  cerrarModal('modalEstrategia');
-  renderAll();
-}
-
-function abrirModalActualizar() {
-  const p = getPortfolio();
-  const form = document.getElementById('modalActivosForms');
-  form.innerHTML = '';
-  getActivos().forEach(a => {
-    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
-    form.innerHTML += `
-      <div class="modal-field">
-        <label>${a.emoji || '💼'} ${a.nombre}</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <input type="number" id="val_${a.id}" placeholder="Valor actual €" value="${pos.valorActual || ''}" />
-          <input type="number" id="aport_${a.id}" placeholder="Total aportado €" value="${pos.totalAportado || ''}" />
-        </div>
-      </div>`;
-  });
-  document.getElementById('modalActualizar').classList.add('open');
-}
-
-function guardarValores() {
-  const d = getData();
-  if (!d.portfolio) d.portfolio = {};
-  getActivos().forEach(a => {
-    const val = parseFloat(document.getElementById('val_' + a.id).value) || 0;
-    const aport = parseFloat(document.getElementById('aport_' + a.id).value) || 0;
-    d.portfolio[a.id] = { valorActual: val, totalAportado: aport };
-  });
-  saveData(d);
-  cerrarModal('modalActualizar');
-  renderAll();
-}
-
-function abrirModalAportacion() {
-  const sel = document.getElementById('aportMes');
-  sel.innerHTML = DCA_MESES.map(m => `<option value="${m}">${m}</option>`).join('');
-  const est = getEstrategia();
-  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
-  document.getElementById('modalAportacion').classList.add('open');
-}
-
-function abrirModalAportacionMes(mes) {
-  const sel = document.getElementById('aportMes');
-  sel.innerHTML = DCA_MESES.map(m => `<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
-  const est = getEstrategia();
-  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
-  document.getElementById('modalAportacion').classList.add('open');
-}
-
-function guardarAportacion() {
-  const mes = document.getElementById('aportMes').value;
-  const importe = parseFloat(document.getElementById('aportImporte').value) || 0;
-  const nota = document.getElementById('aportNota').value.trim();
-
-  const d = getData();
-  if (!d.aportaciones) d.aportaciones = [];
-  d.aportaciones = d.aportaciones.filter(a => a.mes !== mes);
-  d.aportaciones.push({ mes, importe, nota, ejecutado: true });
-  saveData(d);
-  cerrarModal('modalAportacion');
-  renderAll();
-}
-
-function exportarBackupJSON() {
-  const data = getData();
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `portfolio_backup_${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); }); });
-
-function renderAll() {
-  renderDCA();
-  renderKPIs();
-  renderTabla();
-  renderDonut();
-  renderPlataformas();
-}
-
-window.renderAll = renderAll;
-renderAll();
-</script>
-
-<!-- FIREBASE SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
-  authDomain: "mis-finanzas-85c47.firebaseapp.com",
-  projectId: "mis-finanzas-85c47",
-  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
-  messagingSenderId: "584441374984",
-  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const DOC_REF = db.collection('usuarios').doc('miquel_portfolio');
-let _syncBlocked = false;
-
-function setSyncStatus(estado) {
-  const el = document.getElementById('syncStatus');
-  if (!el) return;
-  if (estado === 'ok') { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
-  if (estado === 'saving') { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
-  if (estado === 'error') { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
-}
-
-function saveDataCloud(d) {
-  saveDataLocal(d);
-  setSyncStatus('saving');
-  _syncBlocked = true;
-  DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
-    .then(() => { setSyncStatus('ok'); setTimeout(() => { _syncBlocked = false; }, 1000); })
-    .catch(() => { setSyncStatus('error'); _syncBlocked = false; });
-}
-window.saveDataCloud = saveDataCloud;
-
-DOC_REF.onSnapshot(snap => {
-  if (_syncBlocked) return;
-  if (snap.exists) {
-    try {
-      const remoteData = JSON.parse(snap.data().data);
-      saveDataLocal(remoteData);
-      if (typeof renderAll === 'function') renderAll();
-      setSyncStatus('ok');
-    } catch(e) { setSyncStatus('error'); }
-  }
-}, () => { setSyncStatus('error'); });
-</script>
-</body>
-</html>
+      <span>📋 Posiciones actuales y desglose por activo</span>
+      <div
