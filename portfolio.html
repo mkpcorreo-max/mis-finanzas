@@ -147,7 +147,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 /* ESTRATEGIA CARD */
 .estrategia-box {
   background:linear-gradient(135deg,#EDE9FE,#F5F3FF);
-  border:1px solid #C4B5FD; border-radius:14px; padding:20px;
+  border:1px solid #C4B5FD; border-radius:14px; padding:22px;
   font-size:13px; line-height:1.7; color:#4C1D95;
 }
 
@@ -167,8 +167,8 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .modal h3 { font-size:18px; font-weight:800; margin-bottom:16px; }
 .modal-field { margin-bottom:12px; }
 .modal-field label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); display:block; margin-bottom:4px; }
-.modal-field input, .modal-field select { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; outline:none; }
-.modal-field input:focus, .modal-field select:focus { border-color:var(--primary); }
+.modal-field input, .modal-field select, .modal-field textarea { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; outline:none; font-family:inherit; }
+.modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color:var(--primary); }
 .modal-btns { display:flex; gap:10px; margin-top:18px; }
 .btn { padding:10px 18px; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; }
 .btn-primary { background:var(--primary); color:#fff; flex:1; }
@@ -222,12 +222,12 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
   <div class="dca-hero">
     <div>
       <div class="dca-title">🎯 Plan DCA Táctico en Curso</div>
-      <div class="dca-sub">Despliegue de <span id="estr_disp">20.000</span> € en <span id="estr_meses">10</span> meses · Inicio: <span id="estr_fecha">Nov 2026</span></div>
+      <div class="dca-sub">Despliegue de <span id="estr_disp">17.000</span> € en <span id="estr_meses">10</span> meses · Inicio: <span id="estr_fecha">Nov 2026</span></div>
 
       <div class="dca-bar-wrap">
         <div class="dca-bar-label">
           <span id="dcaAportadoLabel">0 € aportados</span>
-          <span id="dcaObjetivoLabel">Objetivo: 20.000 €</span>
+          <span id="dcaObjetivoLabel">Objetivo: 17.000 €</span>
         </div>
         <div class="dca-bar"><div class="dca-bar-fill" id="dcaBarFill" style="width:0%"></div></div>
       </div>
@@ -312,7 +312,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
         <div class="donut-wrap">
           <canvas id="donutCanvas" width="160" height="160"></canvas>
           <div class="donut-center">
-            <div class="donut-center-val" id="dca_mens_estimado">2.000€</div>
+            <div class="donut-center-val" id="dca_mens_estimado">1.400€</div>
             <div class="donut-center-label">/ mes DCA</div>
           </div>
         </div>
@@ -320,27 +320,14 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
       </div>
     </div>
 
-    <!-- CUADRO DE ESTRATEGIA DETALLADO -->
+    <!-- CUADRO DE ESTRATEGIA DETALLADO (EDITABLE) -->
     <div class="card" style="margin-bottom:0">
       <div class="card-title">
-        <span>🎯 Cuadro de Estrategia</span>
+        <span>🎯 Estrategia</span>
         <button class="btn btn-primary btn-sm" onclick="abrirModalEstrategia()" style="padding:4px 10px;font-size:10px">✏️ Modificar</button>
       </div>
-      <div class="estrategia-box">
-        <div style="font-weight:800;margin-bottom:8px;font-size:14px">DCA Táctico de <span id="st_plazo">10</span> meses</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div>Capital total: <strong id="st_cap">20.000 €</strong></div>
-          <div>Cuota mensual: <strong id="st_mensual">2.000 €/mes</strong></div>
-          <div>Fecha inicio: <strong id="st_ini">Nov 2026</strong></div>
-          <div>Estado: <strong style="color:var(--green)">Activo</strong></div>
-        </div>
-        <div style="border-top:1px dashed #C4B5FD;padding-top:8px;font-size:12px">
-          <strong>Reglas tácticas:</strong>
-          <ul style="margin-top:2px;padding-left:14px">
-            <li>Asignación DCA directa en euros (€/mes) por fondo.</li>
-            <li>Rebalanceo periódico al finalizar el plazo.</li>
-          </ul>
-        </div>
+      <div class="estrategia-box" id="estrategiaBoxContent">
+        <!-- Contenido renderizado dinámicamente -->
       </div>
     </div>
   </div>
@@ -378,10 +365,10 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 <div class="modal-overlay" id="modalEstrategia">
   <div class="modal">
     <button class="modal-close" onclick="cerrarModal('modalEstrategia')">✕</button>
-    <h3>🎯 Configurar Estrategia DCA</h3>
+    <h3>🎯 Configurar Estrategia y Estructura</h3>
     <div class="modal-field">
       <label>Capital total a desplegar (€)</label>
-      <input type="number" id="estrInputCapital" value="20000" min="0" step="1000" />
+      <input type="number" id="estrInputCapital" value="17000" min="0" step="1000" />
     </div>
     <div class="modal-field">
       <label>Plazo de despliegue (meses)</label>
@@ -395,6 +382,19 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
     <div class="modal-field">
       <label>Mes de inicio</label>
       <input type="text" id="estrInputInicio" value="Nov 2026" />
+    </div>
+    <div class="modal-field">
+      <label>Texto de estructura detallada (puedes editar líneas, porcentajes o descripciones)</label>
+      <textarea id="estrInputTexto" rows="8" style="font-family:monospace;font-size:12px;line-height:1.5;">🇺🇸 S&P 500 — 400€/mes (25%) — Motor principal
+🇪🇺 Europa — 300€/mes (18%) — Diversificación geográfica
+🥇 Oro — 300€/mes (18%) — Refugio y cobertura
+📈 Bitcoin — 200€/mes (12%) — Activo alternativo / Cripto
+📈 Emergentes — 200€/mes (12%) — Crecimiento emergente
+💧 Liquidez — 0€/mes (15%) — Buffer táctico</textarea>
+    </div>
+    <div class="modal-field">
+      <label>Nota final de cierre</label>
+      <input type="text" id="estrInputNota" value="Una vez completados los 10 meses, la cartera entra en fase de mantenimiento y rebalanceo periódico." />
     </div>
     <div class="modal-btns">
       <button class="btn btn-cancel" onclick="cerrarModal('modalEstrategia')">Cancelar</button>
@@ -427,7 +427,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
     </div>
     <div class="modal-field">
       <label>Importe ejecutado (€)</label>
-      <input type="number" id="aportImporte" value="2000" min="0" step="100" />
+      <input type="number" id="aportImporte" value="1400" min="0" step="100" />
     </div>
     <div class="modal-field">
       <label>Nota (opcional)</label>
@@ -443,12 +443,12 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 <script>
 const DEFAULT_ACTIVOS = [
   { id: 'sp500', nombre: 'Fidelity S&P 500 Index Fund P Acc', ticker: 'IE00BYX5NX33', emoji: '🇺🇸', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#6C63FF', posicionInicial: 2500, esLiquidez: false, dcaMensual: 400 },
-  { id: 'europa', nombre: 'Vanguard European Stock Index EUR Acc', ticker: 'IE00B945VV12', emoji: '🇪🇺', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#3B82F6', posicionInicial: 1800, esLiquidez: false, dcaMensual: 400 },
-  { id: 'oro', nombre: 'Physical Gold USD acc', ticker: 'IE00B4ND3602', emoji: '🥇', categoria: 'oro', catLabel: 'Oro / Refugio', plataforma: 'trade', platLabel: 'Trade Republic', color: '#F59E0B', posicionInicial: 0, esLiquidez: false, dcaMensual: 400 },
-  { id: 'bitcoin', nombre: 'BITCOIN', ticker: 'N/D', emoji: '📈', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'trade', platLabel: 'Trade Republic', color: '#EF4444', posicionInicial: 749, esLiquidez: false, dcaMensual: 400 },
-  { id: 'emerging', nombre: 'FIDELITY MSCI EMERGING MARKETS', ticker: 'N/D', emoji: '📈', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#34D399', posicionInicial: 2500, esLiquidez: false, dcaMensual: 400 },
+  { id: 'europa', nombre: 'Vanguard European Stock Index EUR Acc', ticker: 'IE00B945VV12', emoji: '🇪🇺', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#3B82F6', posicionInicial: 0, esLiquidez: false, dcaMensual: 300 },
+  { id: 'oro', nombre: 'Physical Gold USD acc', ticker: 'IE00B4ND3602', emoji: '🥇', categoria: 'oro', catLabel: 'Oro / Refugio', plataforma: 'trade', platLabel: 'Trade Republic', color: '#F59E0B', posicionInicial: 0, esLiquidez: false, dcaMensual: 300 },
   { id: 'liquidez_mi', nombre: 'Efectivo Remunerado / Groupama Trésorerie IC', ticker: 'Monetario', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#10B981', posicionInicial: 3500, esLiquidez: true, dcaMensual: 0 },
-  { id: 'liquidez_tr', nombre: 'Efectivo Remunerado Trade Republic', ticker: '2,5% TAE', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'trade', platLabel: 'Trade Republic', color: '#34D399', posicionInicial: 2600, esLiquidez: true, dcaMensual: 0 }
+  { id: 'liquidez_tr', nombre: 'Efectivo Remunerado Trade Republic', ticker: '2,5% TAE', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'trade', platLabel: 'Trade Republic', color: '#34D399', posicionInicial: 2600, esLiquidez: true, dcaMensual: 0 },
+  { id: 'activo_1792955056320', nombre: 'BITCOIN', ticker: 'N/D', emoji: '📈', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'trade', platLabel: 'Trade Republic', color: '#EF4444', posicionInicial: 0, esLiquidez: false, dcaMensual: 200 },
+  { id: 'activo_1792955307936', nombre: 'FIDELITY MSCI EMERGING MARKETS', ticker: 'ISIN0000', emoji: '📈', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#34D399', posicionInicial: 0, esLiquidez: false, dcaMensual: 200 }
 ];
 
 const DCA_MESES = ['Nov 2026','Dic 2026','Ene 2027','Feb 2027','Mar 2027','Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027','Sep 2027','Oct 2027'];
@@ -479,7 +479,13 @@ function getActivos() {
 function getEstrategia() {
   const d = getData();
   if (!d.estrategia) {
-    d.estrategia = { capitalTotal: 20000, plazoMeses: 10, inicioMes: 'Nov 2026' };
+    d.estrategia = {
+      capitalTotal: 17000,
+      plazoMeses: 10,
+      inicioMes: 'Nov 2026',
+      textoDetalle: '🇺🇸 S&P 500 — 400€/mes (25%) — Motor principal\n🇪🇺 Europa — 300€/mes (18%) — Diversificación geográfica\n🥇 Oro — 300€/mes (18%) — Refugio y cobertura\n📈 Bitcoin — 200€/mes (12%) — Activo alternativo / Cripto\n📈 Emergentes — 200€/mes (12%) — Crecimiento emergente\n💧 Liquidez — 0€/mes (15%) — Buffer táctico',
+      notaFinal: 'Una vez completados los 10 meses, la cartera entra en fase de mantenimiento y rebalanceo periódico.'
+    };
     saveDataLocal(d);
   }
   return d.estrategia;
@@ -521,16 +527,23 @@ function renderDCA() {
   document.getElementById('estr_meses').textContent = est.plazoMeses;
   document.getElementById('estr_fecha').textContent = est.inicioMes;
 
-  document.getElementById('st_cap').textContent = fmtK(est.capitalTotal);
-  document.getElementById('st_plazo').textContent = est.plazoMeses;
-  
-  // Calcular suma total configurada de DCA mensual en euros
   let sumaDcaMensual = 0;
   getActivos().forEach(a => { if (!a.esLiquidez) sumaDcaMensual += (a.dcaMensual || 0); });
   
-  document.getElementById('st_mensual').textContent = fmtK(sumaDcaMensual) + '/mes';
-  document.getElementById('st_ini').textContent = est.inicioMes;
   document.getElementById('dca_mens_estimado').textContent = fmtK(sumaDcaMensual);
+
+  // Renderizar caja de estrategia detallada
+  const box = document.getElementById('estrategiaBoxContent');
+  const lineasHtml = (est.textoDetalle || '').split('\n').map(l => `<div style="margin-bottom:4px">${l}</div>`).join('');
+  box.innerHTML = `
+    <div style="font-weight:900;margin-bottom:10px;font-size:14px;color:#3B118C">
+      DCA Táctico de ${est.plazoMeses} meses para desplegar ${est.capitalTotal.toLocaleString('es-ES')} € de capital inicial líquido a razón de ${sumaDcaMensual.toLocaleString('es-ES')} €/mes.
+    </div>
+    <div style="margin-bottom:12px">${lineasHtml}</div>
+    <div style="border-top:1px dashed #C4B5FD;padding-top:10px;font-size:12px;opacity:.9">
+      ${est.notaFinal || ''}
+    </div>
+  `;
 
   const wrap = document.getElementById('dcaMonths');
   wrap.innerHTML = '';
@@ -715,7 +728,7 @@ function renderDonut() {
   });
 }
 
-// MODAL GESTIÓN MANUAL DE ACTIVOS (CON CANTIDAD FIJA €/mes)
+// MODAL GESTIÓN MANUAL DE ACTIVOS
 function abrirModalGestionActivos() {
   const activos = getActivos();
   const container = document.getElementById('listaActivosConfig');
@@ -825,16 +838,20 @@ function abrirModalEstrategia() {
   document.getElementById('estrInputCapital').value = est.capitalTotal;
   document.getElementById('estrInputPlazo').value = est.plazoMeses;
   document.getElementById('estrInputInicio').value = est.inicioMes;
+  document.getElementById('estrInputTexto').value = est.textoDetalle || '';
+  document.getElementById('estrInputNota').value = est.notaFinal || '';
   document.getElementById('modalEstrategia').classList.add('open');
 }
 
 function guardarEstrategia() {
-  const cap = parseFloat(document.getElementById('estrInputCapital').value) || 20000;
+  const cap = parseFloat(document.getElementById('estrInputCapital').value) || 17000;
   const plz = parseInt(document.getElementById('estrInputPlazo').value) || 10;
   const ini = document.getElementById('estrInputInicio').value.trim() || 'Nov 2026';
+  const texto = document.getElementById('estrInputTexto').value;
+  const nota = document.getElementById('estrInputNota').value;
 
   const d = getData();
-  d.estrategia = { capitalTotal: cap, plazoMeses: plz, inicioMes: ini };
+  d.estrategia = { capitalTotal: cap, plazoMeses: plz, inicioMes: ini, textoDetalle: texto, notaFinal: nota };
   saveData(d);
   cerrarModal('modalEstrategia');
   renderAll();
