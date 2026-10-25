@@ -275,4 +275,667 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
   <div class="card" style="margin-bottom:20px">
     <div class="card-title">
       <span>📋 Posiciones actuales y desglose por activo</span>
-      <div
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="exportarBackupJSON()">📥 Backup</button>
+        <button class="btn btn-secondary btn-sm" onclick="abrirModalGestionActivos()">➕ Añadir / Editar Fondo</button>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalActualizar()">✏️ Actualizar saldos</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="activos-table" id="activosTable">
+        <thead>
+          <tr>
+            <th>Activo / Ticker</th>
+            <th>Categoría</th>
+            <th>Plataforma</th>
+            <th>Peso Real %</th>
+            <th>Aportado</th>
+            <th>Valor actual</th>
+            <th>Rentab. %</th>
+            <th>DCA €/mes</th>
+          </tr>
+        </thead>
+        <tbody id="activosTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <!-- DISTRIBUCIÓN DONUT -->
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">
+        <span>🥧 Distribución Objetivo</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <div class="donut-wrap">
+          <canvas id="donutCanvas" width="160" height="160"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-val" id="dca_mens_estimado">2.000€</div>
+            <div class="donut-center-label">/ mes DCA</div>
+          </div>
+        </div>
+        <div class="leyenda" id="donutLeyenda"></div>
+      </div>
+    </div>
+
+    <!-- CUADRO DE ESTRATEGIA DETALLADO -->
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">
+        <span>🎯 Cuadro de Estrategia</span>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalEstrategia()" style="padding:4px 10px;font-size:10px">✏️ Modificar</button>
+      </div>
+      <div class="estrategia-box">
+        <div style="font-weight:800;margin-bottom:8px;font-size:14px">DCA Táctico de <span id="st_plazo">10</span> meses</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>Capital total: <strong id="st_cap">20.000 €</strong></div>
+          <div>Cuota mensual: <strong id="st_mensual">2.000 €/mes</strong></div>
+          <div>Fecha inicio: <strong id="st_ini">Nov 2026</strong></div>
+          <div>Estado: <strong style="color:var(--green)">Activo</strong></div>
+        </div>
+        <div style="border-top:1px dashed #C4B5FD;padding-top:8px;font-size:12px">
+          <strong>Reglas tácticas:</strong>
+          <ul style="margin-top:2px;padding-left:14px">
+            <li>Asignación proporcional por peso de fondo.</li>
+            <li>Rebalanceo periódico al finalizar el plazo.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDARIO DCA & REGISTRO -->
+  <div class="card">
+    <div class="card-title">📅 Calendario de aportaciones mensuales DCA</div>
+    <div class="dca-registro" id="dcaRegistro"></div>
+  </div>
+
+</div>
+
+<!-- MODAL GESTIÓN DE ACTIVOS -->
+<div class="modal-overlay" id="modalGestionActivos">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modalGestionActivos')">✕</button>
+    <h3>⚙️ Gestión y Configuración de Activos</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Modifica el nombre, ticker, plataforma o elimina cualquier fondo de la cartera de forma manual.</p>
+    
+    <div id="listaActivosConfig" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8F9FF;border-radius:10px;margin-bottom:20px">
+      <button class="btn btn-secondary btn-sm" onclick="agregarNuevoActivoConfig()">➕ Añadir nuevo fondo</button>
+      <div style="font-size:12px;color:var(--text-muted)">Gestión 100% manual por activo</div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalGestionActivos')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarConfiguracionActivos()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ESTRATEGIA -->
+<div class="modal-overlay" id="modalEstrategia">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modalEstrategia')">✕</button>
+    <h3>🎯 Configurar Estrategia DCA</h3>
+    <div class="modal-field">
+      <label>Capital total a desplegar (€)</label>
+      <input type="number" id="estrInputCapital" value="20000" min="0" step="1000" />
+    </div>
+    <div class="modal-field">
+      <label>Plazo de despliegue (meses)</label>
+      <select id="estrInputPlazo">
+        <option value="6">6 meses</option>
+        <option value="10" selected>10 meses</option>
+        <option value="12">12 meses</option>
+        <option value="18">18 meses</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Mes de inicio</label>
+      <input type="text" id="estrInputInicio" value="Nov 2026" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalEstrategia')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEstrategia()">💾 Guardar Estrategia</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACTUALIZAR SALDOS -->
+<div class="modal-overlay" id="modalActualizar">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modalActualizar')">✕</button>
+    <h3>✏️ Actualizar saldos reales</h3>
+    <div id="modalActivosForms"></div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalActualizar')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarValores()">💾 Guardar saldos</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL APORTACIÓN DCA -->
+<div class="modal-overlay" id="modalAportacion">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modalAportacion')">✕</button>
+    <h3>➕ Registrar aportación mensual</h3>
+    <div class="modal-field">
+      <label>Mes</label>
+      <select id="aportMes"></select>
+    </div>
+    <div class="modal-field">
+      <label>Importe ejecutado (€)</label>
+      <input type="number" id="aportImporte" value="2000" min="0" step="100" />
+    </div>
+    <div class="modal-field">
+      <label>Nota (opcional)</label>
+      <input type="text" id="aportNota" placeholder="Ej: ejecutado vía transferencia" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalAportacion')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarAportacion()">✅ Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_ACTIVOS = [
+  { id: 'sp500', nombre: 'Fidelity S&P 500 Index Fund', ticker: 'IE00BYX5NX33', emoji: '🇺🇸', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#6C63FF', posicionInicial: 2500, esLiquidez: false },
+  { id: 'europa', nombre: 'Vanguard European Stock Index', ticker: 'IE00B945VV12', emoji: '🇪🇺', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#3B82F6', posicionInicial: 1800, esLiquidez: false },
+  { id: 'india', nombre: 'Franklin India Fund Class A', ticker: 'LU0231205187', emoji: '🇮🇳', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#F97316', posicionInicial: 0, esLiquidez: false },
+  { id: 'china', nombre: 'Franklin FTSE China Index Fund', ticker: 'IE00BHZRR150', emoji: '🇨🇳', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#EF4444', posicionInicial: 0, esLiquidez: false },
+  { id: 'oro', nombre: 'iShares Physical Gold ETC', ticker: 'IE00B4ND3602', emoji: '🥇', categoria: 'oro', catLabel: 'Oro / Refugio', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#F59E0B', posicionInicial: 0, esLiquidez: false },
+  { id: 'liquidez_mi', nombre: 'Efectivo Remunerado / Groupama', ticker: 'Monetario', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#10B981', posicionInicial: 3500, esLiquidez: true },
+  { id: 'liquidez_tr', nombre: 'Efectivo Remunerado Trade Republic', ticker: '2,5% TAE', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'trade', platLabel: 'Trade Republic', color: '#34D399', posicionInicial: 2600, esLiquidez: true }
+];
+
+const DCA_MESES = ['Nov 2026','Dic 2026','Ene 2027','Feb 2027','Mar 2027','Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027','Sep 2027','Oct 2027'];
+
+function getData() {
+  try { return JSON.parse(localStorage.getItem('portfolio_data') || '{}'); }
+  catch(e) { return {}; }
+}
+
+function saveDataLocal(d) {
+  try { localStorage.setItem('portfolio_data', JSON.stringify(d)); } catch(e){}
+}
+
+function saveData(d) {
+  saveDataLocal(d);
+  if (typeof window.saveDataCloud === 'function') window.saveDataCloud(d);
+}
+
+function getActivos() {
+  const d = getData();
+  if (!d.activosList || !Array.isArray(d.activosList)) {
+    d.activosList = DEFAULT_ACTIVOS;
+    saveDataLocal(d);
+  }
+  const dcaAssets = d.activosList.filter(a => !a.esLiquidez);
+  if (dcaAssets.length > 0) {
+    const p = parseFloat((100 / dcaAssets.length).toFixed(2));
+    dcaAssets.forEach(a => a.pctObjetivo = p);
+  }
+  return d.activosList;
+}
+
+function getEstrategia() {
+  const d = getData();
+  if (!d.estrategia) {
+    d.estrategia = { capitalTotal: 20000, plazoMeses: 10, inicioMes: 'Nov 2026' };
+    saveDataLocal(d);
+  }
+  return d.estrategia;
+}
+
+function getPortfolio() {
+  const d = getData();
+  if (!d.portfolio) d.portfolio = {};
+  getActivos().forEach(a => {
+    if (!d.portfolio[a.id]) {
+      d.portfolio[a.id] = { valorActual: a.posicionInicial || 0, totalAportado: a.posicionInicial || 0 };
+    }
+  });
+  return d.portfolio;
+}
+
+function getAportaciones() {
+  const d = getData();
+  if (!d.aportaciones) { d.aportaciones = []; saveDataLocal(d); }
+  return d.aportaciones;
+}
+
+function fmt(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+function fmtK(n) { return Math.abs(n) >= 1000 ? (n/1000).toLocaleString('es-ES',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' K€' : fmt(n); }
+
+function renderDCA() {
+  const aports = getAportaciones();
+  const est = getEstrategia();
+  const ejecutados = aports.filter(a => a.ejecutado).length;
+  const totalAportado = aports.filter(a => a.ejecutado).reduce((s,a) => s + a.importe, 0);
+  const pct = Math.min((totalAportado / est.capitalTotal) * 100, 100);
+
+  document.getElementById('dcaBarFill').style.width = pct + '%';
+  document.getElementById('dcaBigPct').textContent = pct.toFixed(0) + '%';
+  document.getElementById('dcaAportadoLabel').textContent = fmtK(totalAportado) + ' aportados';
+  document.getElementById('dcaObjetivoLabel').textContent = `Objetivo: ${fmtK(est.capitalTotal)}`;
+  
+  document.getElementById('estr_disp').textContent = est.capitalTotal.toLocaleString('es-ES');
+  document.getElementById('estr_meses').textContent = est.plazoMeses;
+  document.getElementById('estr_fecha').textContent = est.inicioMes;
+
+  document.getElementById('st_cap').textContent = fmtK(est.capitalTotal);
+  document.getElementById('st_plazo').textContent = est.plazoMeses;
+  document.getElementById('st_mensual').textContent = fmtK(est.capitalTotal / est.plazoMeses) + '/mes';
+  document.getElementById('st_ini').textContent = est.inicioMes;
+
+  const wrap = document.getElementById('dcaMonths');
+  wrap.innerHTML = '';
+  DCA_MESES.slice(0, est.plazoMeses).forEach((mes, i) => {
+    const aport = aports.find(a => a.mes === mes);
+    const ejecutado = aport && aport.ejecutado;
+    const esActual  = i === ejecutados && ejecutados < est.plazoMeses;
+    const div = document.createElement('div');
+    div.className = 'dca-month-dot ' + (ejecutado ? 'done' : esActual ? 'active' : 'pending');
+    div.textContent = i + 1;
+    div.onclick = () => { if (!ejecutado) { document.getElementById('aportMes').value = mes; abrirModalAportacion(); } };
+    wrap.appendChild(div);
+  });
+
+  renderRegistroDCA(aports, ejecutados);
+}
+
+function renderRegistroDCA(aports, ejecutados) {
+  const wrap = document.getElementById('dcaRegistro');
+  wrap.innerHTML = '';
+  const est = getEstrategia();
+  const mensImporte = est.capitalTotal / est.plazoMeses;
+  
+  DCA_MESES.slice(0, est.plazoMeses).forEach((mes, i) => {
+    const aport = aports.find(a => a.mes === mes);
+    const ejecutado = aport && aport.ejecutado;
+    const div = document.createElement('div');
+    div.className = 'dca-aport-row ' + (ejecutado ? 'ejecutado' : '');
+    div.innerHTML = `
+      <div>
+        <div class="dca-aport-mes">${i+1}. ${mes}</div>
+        ${aport && aport.nota ? `<div style="font-size:11px;color:var(--text-muted)">${aport.nota}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="dca-aport-importe ${ejecutado ? 'ejecutado' : 'pendiente'}">
+          ${ejecutado ? '+' + fmt(aport.importe) : fmt(mensImporte) + ' previsto'}
+        </span>
+        ${ejecutado ? `<button class="btn btn-danger btn-sm" onclick="borrarAportacion('${mes}')">🗑️</button>` : `<button class="btn btn-primary btn-sm" onclick="abrirModalAportacionMes('${mes}')">Registrar</button>`}
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+function borrarAportacion(mes) {
+  if (!confirm(`¿Eliminar registro de ${mes}?`)) return;
+  const d = getData();
+  d.aportaciones = d.aportaciones.filter(a => a.mes !== mes);
+  saveData(d);
+  renderAll();
+}
+
+function renderKPIs() {
+  const p = getPortfolio();
+  let totalValor = 0, totalAportado = 0, totalLiquidez = 0;
+
+  getActivos().forEach(a => {
+    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
+    totalValor += pos.valorActual;
+    totalAportado += pos.totalAportado;
+    if (a.esLiquidez) totalLiquidez += pos.valorActual;
+  });
+
+  const ganancia = totalValor - totalAportado;
+  const rentabPct = totalAportado > 0 ? (ganancia / totalAportado) * 100 : 0;
+
+  document.getElementById('kpiTotal').textContent = fmtK(totalValor + 15000);
+  document.getElementById('kpiInvertido').textContent = fmtK(totalAportado);
+  document.getElementById('kpiRentab').textContent = (rentabPct >= 0 ? '+' : '') + rentabPct.toFixed(2) + '%';
+  document.getElementById('kpiRentab').style.color = rentabPct >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('kpiRentabEur').textContent = (ganancia >= 0 ? '+' : '') + fmtK(ganancia);
+  document.getElementById('kpiLiquidez').textContent = fmtK(totalLiquidez);
+}
+
+function renderTabla() {
+  const p = getPortfolio();
+  const est = getEstrategia();
+  const mensGlobal = est.capitalTotal / est.plazoMeses;
+  const activos = getActivos();
+  document.getElementById('dca_mens_estimado').textContent = fmtK(mensGlobal);
+
+  let totalCarteraVal = 0;
+  activos.forEach(a => {
+    const pos = p[a.id] || { valorActual: 0 };
+    totalCarteraVal += pos.valorActual;
+  });
+
+  const tbody = document.getElementById('activosTbody');
+  tbody.innerHTML = '';
+
+  let totAportado = 0, totValor = 0;
+
+  activos.forEach(a => {
+    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
+    const pesoReal = totalCarteraVal > 0 ? (pos.valorActual / totalCarteraVal) * 100 : 0;
+    const dcaMensual = a.esLiquidez ? 0 : (a.pctObjetivo / 100) * mensGlobal;
+
+    const ganancia = pos.valorActual - pos.totalAportado;
+    const rentPct = pos.totalAportado > 0 ? (ganancia / pos.totalAportado) * 100 : 0;
+    totAportado += pos.totalAportado;
+    totValor += pos.valorActual;
+
+    const rentClass = rentPct > 0.5 ? 'rentab-pos' : rentPct < -0.5 ? 'rentab-neg' : 'rentab-neu';
+    const rentStr = pos.totalAportado > 0 ? `<span class="rentab-pct ${rentClass}">${rentPct >= 0 ? '+' : ''}${rentPct.toFixed(2)}%</span>` : '—';
+    const platClass = a.plataforma === 'myinvestor' ? 'plat-myinvestor' : a.plataforma === 'trade' ? 'plat-trade' : 'plat-bankinter';
+    const catClass = a.categoria === 'rv' ? 'cat-rv' : a.categoria === 'oro' ? 'cat-oro' : 'cat-liquid';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="activo-nombre">${a.emoji || '💼'} ${a.nombre}</div>
+        <div class="activo-ticker">${a.ticker || 'N/D'}</div>
+      </td>
+      <td><span class="badge-categoria ${catClass}">${a.catLabel}</span></td>
+      <td><span class="activo-plat ${platClass}">${a.platLabel}</span></td>
+      <td style="font-weight:700">${pesoReal.toFixed(1)}%</td>
+      <td style="font-weight:600">${pos.totalAportado > 0 ? fmtK(pos.totalAportado) : '—'}</td>
+      <td><span class="valor-actual">${pos.valorActual > 0 ? fmtK(pos.valorActual) : '—'}</span></td>
+      <td>${rentStr}</td>
+      <td>${!a.esLiquidez ? `<strong style="color:var(--primary)">${fmt(dcaMensual)}</strong>` : '—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const totGanancia = totValor - totAportado;
+  const totRent = totAportado > 0 ? (totGanancia / totAportado) * 100 : 0;
+  const tr = document.createElement('tr');
+  tr.style.cssText = 'font-weight:900;background:#F8F9FF';
+  tr.innerHTML = `
+    <td colspan="3">TOTAL CARTERA (sin emergencia)</td>
+    <td>100.0%</td>
+    <td>${fmtK(totAportado)}</td>
+    <td style="color:var(--primary)">${fmtK(totValor)}</td>
+    <td><span class="rentab-pct ${totRent >= 0 ? 'rentab-pos' : 'rentab-neg'}">${totRent >= 0 ? '+' : ''}${totRent.toFixed(2)}%</span></td>
+    <td style="color:var(--primary)">${fmtK(mensGlobal)}</td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function renderDonut() {
+  const canvas = document.getElementById('donutCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 160, 160);
+
+  const p = getPortfolio();
+  const activos = getActivos();
+  let totalVal = 0;
+  activos.forEach(a => { totalVal += (p[a.id] ? p[a.id].valorActual : 0); });
+
+  let startAngle = -Math.PI / 2;
+  activos.forEach(a => {
+    const val = p[a.id] ? p[a.id].valorActual : 0;
+    const pct = totalVal > 0 ? val / totalVal : 0;
+    if (pct <= 0) return;
+    const angle = pct * 2 * Math.PI;
+
+    ctx.beginPath();
+    ctx.moveTo(80, 80);
+    ctx.arc(80, 80, 70, startAngle, startAngle + angle);
+    ctx.closePath();
+    ctx.fillStyle = a.color || '#6C63FF';
+    ctx.fill();
+    startAngle += angle;
+  });
+
+  ctx.beginPath();
+  ctx.arc(80, 80, 44, 0, 2 * Math.PI);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+
+  const leyDiv = document.getElementById('donutLeyenda');
+  leyDiv.innerHTML = '';
+  activos.forEach(a => {
+    const val = p[a.id] ? p[a.id].valorActual : 0;
+    const pct = totalVal > 0 ? (val / totalVal) * 100 : 0;
+    const div = document.createElement('div');
+    div.className = 'ley-item';
+    div.innerHTML = `
+      <div class="ley-dot" style="background:${a.color || '#6C63FF'}"></div>
+      <span class="ley-name">${a.emoji || '💼'} ${a.nombre.split(' ')[0]}</span>
+      <span class="ley-pct" style="color:${a.color || '#6C63FF'}">${pct.toFixed(1)}%</span>
+    `;
+    leyDiv.appendChild(div);
+  });
+}
+
+// MODAL GESTIÓN MANUAL DE ACTIVOS
+function abrirModalGestionActivos() {
+  const activos = getActivos();
+  const container = document.getElementById('listaActivosConfig');
+  container.innerHTML = '';
+
+  activos.forEach((a, idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:grid;grid-template-columns:30px 1fr 110px 110px 40px;gap:8px;align-items:center;background:#FAFAFA;padding:8px;border-radius:8px;border:1px solid var(--border)';
+    div.innerHTML = `
+      <input type="text" value="${a.emoji || '💼'}" id="cfg_emoji_${idx}" style="text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <input type="text" value="${a.nombre}" id="cfg_nombre_${idx}" placeholder="Nombre" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <input type="text" value="${a.ticker || ''}" id="cfg_ticker_${idx}" placeholder="Ticker / ISIN" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <select id="cfg_plat_${idx}" style="padding:6px;border:1px solid var(--border);border-radius:6px">
+        <option value="myinvestor" ${a.plataforma==='myinvestor'?'selected':''}>MyInvestor</option>
+        <option value="trade" ${a.plataforma==='trade'?'selected':''}>Trade Rep.</option>
+      </select>
+      <button class="btn btn-danger btn-sm" onclick="eliminarActivoConfig(${idx})">🗑️</button>
+    `;
+    container.appendChild(div);
+  });
+
+  document.getElementById('modalGestionActivos').classList.add('open');
+}
+
+function agregarNuevoActivoConfig() {
+  const activos = getActivos();
+  activos.push({
+    id: 'activo_' + Date.now(),
+    nombre: 'Nuevo Fondo / Activo',
+    ticker: 'ISIN0000',
+    emoji: '📈',
+    categoria: 'rv',
+    catLabel: 'Renta Variable',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    color: '#6C63FF',
+    posicionInicial: 0,
+    esLiquidez: false
+  });
+  saveDataLocal({ ...getData(), activosList: activos });
+  abrirModalGestionActivos();
+}
+
+function eliminarActivoConfig(idx) {
+  const activos = getActivos();
+  if (activos.length <= 1) { alert('Debe haber al menos un activo.'); return; }
+  activos.splice(idx, 1);
+  saveDataLocal({ ...getData(), activosList: activos });
+  abrirModalGestionActivos();
+}
+
+function guardarConfiguracionActivos() {
+  const activos = getActivos();
+  activos.forEach((a, idx) => {
+    a.emoji = document.getElementById(`cfg_emoji_${idx}`).value.trim() || '💼';
+    a.nombre = document.getElementById(`cfg_nombre_${idx}`).value.trim() || 'Fondo';
+    a.ticker = document.getElementById(`cfg_ticker_${idx}`).value.trim() || 'N/D';
+    a.plataforma = document.getElementById(`cfg_plat_${idx}`).value;
+    a.platLabel = a.plataforma === 'myinvestor' ? 'MyInvestor' : 'Trade Republic';
+  });
+
+  const d = getData();
+  d.activosList = activos;
+  saveData(d);
+  cerrarModal('modalGestionActivos');
+  renderAll();
+}
+
+function abrirModalEstrategia() {
+  const est = getEstrategia();
+  document.getElementById('estrInputCapital').value = est.capitalTotal;
+  document.getElementById('estrInputPlazo').value = est.plazoMeses;
+  document.getElementById('estrInputInicio').value = est.inicioMes;
+  document.getElementById('modalEstrategia').classList.add('open');
+}
+
+function guardarEstrategia() {
+  const cap = parseFloat(document.getElementById('estrInputCapital').value) || 20000;
+  const plz = parseInt(document.getElementById('estrInputPlazo').value) || 10;
+  const ini = document.getElementById('estrInputInicio').value.trim() || 'Nov 2026';
+
+  const d = getData();
+  d.estrategia = { capitalTotal: cap, plazoMeses: plz, inicioMes: ini };
+  saveData(d);
+  cerrarModal('modalEstrategia');
+  renderAll();
+}
+
+function abrirModalActualizar() {
+  const p = getPortfolio();
+  const form = document.getElementById('modalActivosForms');
+  form.innerHTML = '';
+  getActivos().forEach(a => {
+    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
+    form.innerHTML += `
+      <div class="modal-field">
+        <label>${a.emoji || '💼'} ${a.nombre} (${a.ticker || ''})</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <input type="number" id="val_${a.id}" placeholder="Valor actual €" value="${pos.valorActual || ''}" />
+          <input type="number" id="aport_${a.id}" placeholder="Total aportado €" value="${pos.totalAportado || ''}" />
+        </div>
+      </div>`;
+  });
+  document.getElementById('modalActualizar').classList.add('open');
+}
+
+function guardarValores() {
+  const d = getData();
+  if (!d.portfolio) d.portfolio = {};
+  getActivos().forEach(a => {
+    const val = parseFloat(document.getElementById('val_' + a.id).value) || 0;
+    const aport = parseFloat(document.getElementById('aport_' + a.id).value) || 0;
+    d.portfolio[a.id] = { valorActual: val, totalAportado: aport };
+  });
+  saveData(d);
+  cerrarModal('modalActualizar');
+  renderAll();
+}
+
+function abrirModalAportacion() {
+  const sel = document.getElementById('aportMes');
+  sel.innerHTML = DCA_MESES.map(m => `<option value="${m}">${m}</option>`).join('');
+  const est = getEstrategia();
+  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
+  document.getElementById('modalAportacion').classList.add('open');
+}
+
+function abrirModalAportacionMes(mes) {
+  const sel = document.getElementById('aportMes');
+  sel.innerHTML = DCA_MESES.map(m => `<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
+  const est = getEstrategia();
+  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
+  document.getElementById('modalAportacion').classList.add('open');
+}
+
+function guardarAportacion() {
+  const mes = document.getElementById('aportMes').value;
+  const importe = parseFloat(document.getElementById('aportImporte').value) || 0;
+  const nota = document.getElementById('aportNota').value.trim();
+
+  const d = getData();
+  if (!d.aportaciones) d.aportaciones = [];
+  d.aportaciones = d.aportaciones.filter(a => a.mes !== mes);
+  d.aportaciones.push({ mes, importe, nota, ejecutado: true });
+  saveData(d);
+  cerrarModal('modalAportacion');
+  renderAll();
+}
+
+function exportarBackupJSON() {
+  const data = getData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `portfolio_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); }); });
+
+function renderAll() {
+  renderDCA();
+  renderKPIs();
+  renderTabla();
+  renderDonut();
+}
+
+window.renderAll = renderAll;
+renderAll();
+</script>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
+  authDomain: "mis-finanzas-85c47.firebaseapp.com",
+  projectId: "mis-finanzas-85c47",
+  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
+  messagingSenderId: "584441374984",
+  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const DOC_REF = db.collection('usuarios').doc('miquel_portfolio');
+let _syncBlocked = false;
+
+function setSyncStatus(estado) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (estado === 'ok') { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
+  if (estado === 'saving') { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
+  if (estado === 'error') { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
+}
+
+function saveDataCloud(d) {
+  saveDataLocal(d);
+  setSyncStatus('saving');
+  _syncBlocked = true;
+  DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
+    .then(() => { setSyncStatus('ok'); setTimeout(() => { _syncBlocked = false; }, 1000); })
+    .catch(() => { setSyncStatus('error'); _syncBlocked = false; });
+}
+window.saveDataCloud = saveDataCloud;
+
+DOC_REF.onSnapshot(snap => {
+  if (_syncBlocked) return;
+  if (snap.exists) {
+    try {
+      const remoteData = JSON.parse(snap.data().data);
+      saveDataLocal(remoteData);
+      if (typeof renderAll === 'function') renderAll();
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  }
+}, () => { setSyncStatus('error'); });
+</script>
+</body>
+</html>
