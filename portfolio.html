@@ -1,202 +1,878 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Portfolio y Finanzas</title>
-    <!-- Firebase SDKs (Compatibilidad v8/v9) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        h1, h2 { color: #1e293b; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        th { background-color: #f8fafc; font-weight: 600; color: #64748b; }
-        .btn-borrar { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
-        .btn-borrar:hover { background: #d32f2f; color: #fff; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Portfolio de Inversión</title>
+<style>
+:root {  --primary: #6C63FF;  --primary-dk: #5A52D5;  --primary-lt: #EDE9FE;  --green: #10B981;  --green-lt: #D1FAE5;  --red: #EF4444;  --red-lt: #FEE2E2;  --yellow: #F59E0B;  --yellow-lt: #FEF3C7;  --blue: #3B82F6;  --blue-lt: #DBEAFE;  --orange: #F97316;  --gray: #64748B;  --bg: #F0F2F5;  --card: #FFFFFF;  --text: #1E293B;  --text-muted: #64748B;  --border: #E2E8F0;}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); }
+/* HEADER */
+.header {  background:linear-gradient(135deg,#0F172A 0%,#1E293B 60%,#0F172A 100%);  color:#fff; padding:24px 32px;  display:flex; align-items:center; justify-content:space-between;  box-shadow:0 4px 24px rgba(0,0,0,.3);}
+.header h1 { font-size:24px; font-weight:900; }
+.header p  { font-size:12px; opacity:.6; margin-top:3px; }
+.nav-links { display:flex; gap:10px; align-items:center; }
+.nav-link {  padding:8px 16px; border-radius:20px; font-size:13px; font-weight:600;  text-decoration:none; border:2px solid rgba(255,255,255,.25); color:#fff; transition:all .2s;}
+.nav-link:hover { background:rgba(255,255,255,.1); }
+.nav-link.active { background:var(--primary); border-color:var(--primary); }
+/* LAYOUT */
+.container { max-width:1200px; margin:0 auto; padding:28px 20px; }
+/* CARDS */
+.card {  background:var(--card); border-radius:16px;  padding:22px; box-shadow:0 2px 16px rgba(0,0,0,.06); margin-bottom:20px;}
+.card-title {  font-size:12px; font-weight:800; text-transform:uppercase;  letter-spacing:1.2px; color:var(--text-muted);  margin-bottom:16px; display:flex; align-items:center; gap:8px;}
+/* KPI STRIP */
+.kpi-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:20px; }
+.kpi {  background:var(--card); border-radius:14px; padding:16px 18px;  box-shadow:0 2px 12px rgba(0,0,0,.05); border-top:3px solid var(--border);}
+.kpi.k1 { border-top-color:var(--primary); }
+.kpi.k2 { border-top-color:var(--green); }
+.kpi.k3 { border-top-color:var(--yellow); }
+.kpi.k4 { border-top-color:var(--blue); }
+.kpi.k5 { border-top-color:var(--orange); }
+.kpi-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:4px; }
+.kpi-val   { font-size:20px; font-weight:900; }
+.kpi-sub   { font-size:10px; color:var(--text-muted); margin-top:2px; }
+/* DCA PROGRESS HERO */
+.dca-hero {  background:linear-gradient(135deg,#0F172A,#1E293B);  border-radius:20px; padding:28px 32px; color:#fff; margin-bottom:20px;  display:grid; grid-template-columns:1fr auto; gap:24px; align-items:center;}
+.dca-title  { font-size:22px; font-weight:900; margin-bottom:4px; }
+.dca-sub    { font-size:13px; opacity:.6; margin-bottom:20px; }
+.dca-bar-wrap { margin-bottom:12px; }
+.dca-bar-label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; }
+.dca-bar { height:14px; background:rgba(255,255,255,.1); border-radius:10px; overflow:hidden; }
+.dca-bar-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#6C63FF,#10B981); transition:width .8s; }
+.dca-months { display:flex; gap:6px; margin-top:16px; flex-wrap:wrap; }
+.dca-month-dot {  width:34px; height:34px; border-radius:50%; border:2px solid rgba(255,255,255,.2);  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;  color:rgba(255,255,255,.5); transition:all .2s; cursor:pointer;}
+.dca-month-dot.done { background:var(--green); border-color:var(--green); color:#fff; }
+.dca-month-dot.active { background:var(--primary); border-color:var(--primary); color:#fff; box-shadow:0 0 0 4px rgba(108,99,255,.3); }
+.dca-month-dot.pending { border-style:dashed; }
+.dca-stats { text-align:right; }
+.dca-big { font-size:42px; font-weight:900; color:var(--green); line-height:1; }
+.dca-big-label { font-size:12px; opacity:.6; margin-top:4px; }
+.dca-objetivo { font-size:13px; opacity:.5; margin-top:8px; }
+/* GRID */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+/* TABLA ACTIVOS */
+.activos-table { width:100%; border-collapse:collapse; }
+.activos-table th {  text-align:left; font-size:10px; font-weight:800; text-transform:uppercase;  letter-spacing:1px; color:var(--text-muted); padding:10px 12px;  border-bottom:2px solid var(--border); white-space:nowrap;}
+.activos-table td { padding:14px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.activos-table tr:last-child td { border-bottom:none; }
+.activos-table tr:hover td { background:#F8FAFF; }
+.activo-nombre { font-weight:700; font-size:14px; }
+.activo-ticker { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.activo-plat   { font-size:10px; padding:2px 8px; border-radius:8px; font-weight:700; display:inline-block; margin-top:3px; }
+.plat-myinvestor { background:#EDE9FE; color:#6C63FF; }
+.plat-trade      { background:#D1FAE5; color:#065F46; }
+.plat-citibank   { background:#DBEAFE; color:#1D4ED8; }
+.badge-categoria {  font-size:10px; padding:3px 8px; border-radius:8px; font-weight:700; display:inline-block;}
+.cat-rv      { background:#DBEAFE; color:#1D4ED8; }
+.cat-oro     { background:#FEF3C7; color:#D97706; }
+.cat-liquid  { background:#D1FAE5; color:#065F46; }
+.cat-emerg   { background:#FEE2E2; color:#991B1B; }
+.valor-actual { font-size:16px; font-weight:900; }
+.rentab-pct   { font-size:12px; font-weight:700; padding:3px 8px; border-radius:8px; }
+.rentab-pos   { background:var(--green-lt); color:var(--green); }
+.rentab-neg   { background:var(--red-lt); color:var(--red); }
+.rentab-neu   { background:#F1F5F9; color:var(--gray); }
+/* DONUT CHART */
+.donut-wrap { position:relative; width:180px; height:180px; margin:0 auto; }
+.donut-wrap canvas { position:absolute; top:0; left:0; }
+.donut-center {  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);  text-align:center;}
+.donut-center-val   { font-size:18px; font-weight:900; color:var(--text); }
+.donut-center-label { font-size:10px; color:var(--text-muted); margin-top:2px; }
+/* LEYENDA */
+.leyenda { display:flex; flex-direction:column; gap:8px; }
+.ley-item { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.ley-dot  { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.ley-name { font-size:12px; flex:1; }
+.ley-pct  { font-size:12px; font-weight:700; }
+/* PLATAFORMAS */
+.plat-card {  border-radius:14px; padding:18px; border:2px solid var(--border);  display:flex; flex-direction:column; gap:10px;}
+.plat-header { display:flex; align-items:center; gap:10px; }
+.plat-logo   { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.plat-nombre { font-size:15px; font-weight:800; }
+.plat-tipo   { font-size:11px; color:var(--text-muted); }
+.plat-total  { font-size:22px; font-weight:900; }
+.plat-sub    { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.plat-bar    { height:6px; background:var(--border); border-radius:6px; overflow:hidden; margin-top:4px; }
+.plat-bar-fill { height:100%; border-radius:6px; }
+/* MODAL / EDIT */
+.modal-overlay {  display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);  z-index:1000; align-items:center; justify-content:center; padding:20px;}
+.modal-overlay.open { display:flex; }
+.modal {  background:#fff; border-radius:20px; padding:28px;  width:100%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal h3 { font-size:18px; font-weight:800; margin-bottom:20px; }
+.modal-field { margin-bottom:14px; }
+.modal-field label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); display:block; margin-bottom:5px; }
+.modal-field input { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; outline:none; }
+.modal-field input:focus { border-color:var(--primary); }
+.modal-btns { display:flex; gap:10px; margin-top:20px; }
+.btn { padding:11px 20px; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; }
+.btn-primary { background:var(--primary); color:#fff; flex:1; }
+.btn-primary:hover { background:var(--primary-dk); }
+.btn-cancel  { background:#F1F5F9; color:var(--text-muted); }
+.btn-danger  { background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; }
+.btn-danger:hover { background:#DC2626; color:#FFF; }
+/* REGISTRO DCA */
+.dca-registro { display:flex; flex-direction:column; gap:10px; }
+.dca-aport-row {  display:flex; align-items:center; justify-content:space-between;  padding:12px 16px; border-radius:12px; border:1.5px solid var(--border);  transition:all .2s;}
+.dca-aport-row.ejecutado { border-color:var(--green); background:var(--green-lt); }
+.dca-aport-row.pendiente { border-color:var(--border); background:#FAFAFA; opacity:.7; }
+.dca-aport-mes  { font-weight:700; font-size:14px; }
+.dca-aport-importe { font-size:15px; font-weight:900; }
+.dca-aport-importe.ejecutado { color:var(--green); }
+.dca-aport-importe.pendiente { color:var(--text-muted); }
+.btn-sm { padding:6px 14px; font-size:12px; border-radius:8px; }
+/* NOTAS */
+.nota-estrategia {  background:linear-gradient(135deg,#EDE9FE,#F5F3FF);  border:1px solid #C4B5FD; border-radius:14px; padding:18px;  font-size:13px; line-height:1.7; color:#4C1D95;}
+@media(max-width:900px) {  .kpi-strip { grid-template-columns:repeat(3,1fr); }  .grid-2, .grid-3 { grid-template-columns:1fr; }  .dca-hero { grid-template-columns:1fr; }  .dca-stats { text-align:left; }  .header { flex-direction:column; gap:12px; }}
+</style>
 </head>
 <body>
 
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1>💼 Portfolio de Inversión</h1>
+    <p>Estrategia DCA · MyInvestor · Trade Republic · Citibank</p>
+  </div>
+  <div class="nav-links">
+    <a href="calculadora-gastos.html" class="nav-link">💰 Gastos</a>
+    <a href="simulador-inversion.html" class="nav-link">📈 Simulador</a>
+    <a href="portfolio.html" class="nav-link active">💼 Portfolio</a>
+    <div id="syncStatus" style="font-size:12px;color:#aaa;margin-left:8px">🔄 Cargando...</div>
+  </div>
+</div>
+
 <div class="container">
-    <h1>Portfolio y Control de Finanzas</h1>
-    
-    <!-- Resumen de KPIs / Totales -->
-    <div id="kpis">
-        <p>Total Portfolio: <strong id="kpiTotal">0 €</strong></p>
-        <p>Total Invertido: <strong id="kpiInvertido">0 €</strong></p>
-        <p>Rentabilidad: <strong id="kpiRentab">0%</strong> (<span id="kpiRentabEur">0 €</span>)</p>
-        <p>Liquidez: <strong id="kpiLiquidez">0 €</strong></p>
+  <!-- DCA PROGRESS HERO -->
+  <div class="dca-hero">
+    <div>
+      <div class="dca-title">🎯 DCA Táctico — Fase de Acumulación</div>
+      <div class="dca-sub">Despliegue gradual de 20.000 € en 10 meses · Inicio: Nov 2026</div>
+
+      <div class="dca-bar-wrap">
+        <div class="dca-bar-label">
+          <span id="dcaAportadoLabel">0 € aportados</span>
+          <span style="opacity:.5">Objetivo: 20.000 €</span>
+        </div>
+        <div class="dca-bar"><div class="dca-bar-fill" id="dcaBarFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="dca-months" id="dcaMonths"></div>
+    </div>
+    <div class="dca-stats">
+      <div class="dca-big" id="dcaBigPct">0%</div>
+      <div class="dca-big-label">completado</div>
+      <div class="dca-objetivo" style="margin-top:12px" id="dcaMesesLabel">0 / 10 meses</div>
+      <div style="margin-top:16px">
+        <button class="btn btn-primary btn-sm" onclick="abrirModalAportacion()" style="width:100%">
+          ➕ Registrar aportación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-strip">
+    <div class="kpi k1">
+      <div class="kpi-label">💼 Valor total cartera</div>
+      <div class="kpi-val" id="kpiTotal">—</div>
+      <div class="kpi-sub">Todas las plataformas</div>
+    </div>
+    <div class="kpi k2">
+      <div class="kpi-label">💵 Capital invertido</div>
+      <div class="kpi-val" id="kpiInvertido">—</div>
+      <div class="kpi-sub">Total aportado</div>
+    </div>
+    <div class="kpi k3">
+      <div class="kpi-label">📈 Rentabilidad</div>
+      <div class="kpi-val" id="kpiRentab">—</div>
+      <div class="kpi-sub" id="kpiRentabEur">—</div>
+    </div>
+    <div class="kpi k4">
+      <div class="kpi-label">🏦 Fondo emergencia</div>
+      <div class="kpi-val">15.000 €</div>
+      <div class="kpi-sub">Citibank · 3,0% TAE</div>
+    </div>
+    <div class="kpi k5">
+      <div class="kpi-label">💧 Liquidez táctica</div>
+      <div class="kpi-val" id="kpiLiquidez">—</div>
+      <div class="kpi-sub">MyInvestor + TR</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px">
+    <!-- DISTRIBUCIÓN DONUT -->
+    <div class="card">
+      <div class="card-title">🥧 Distribución objetivo de la cartera</div>
+      <div style="display:flex;align-items:center;gap:28px">
+        <div class="donut-wrap" id="donutWrap">
+          <canvas id="donutCanvas" width="180" height="180"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-val">2.000€</div>
+            <div class="donut-center-label">/ mes DCA</div>
+          </div>
+        </div>
+        <div class="leyenda" id="donutLeyenda"></div>
+      </div>
     </div>
 
-    <h2>Historial de Aportaciones e Ingresos</h2>
-    <table>
+    <!-- PLATAFORMAS -->
+    <div class="card">
+      <div class="card-title">🏦 Por plataforma</div>
+      <div style="display:flex;flex-direction:column;gap:12px" id="plataformasWrap"></div>
+    </div>
+  </div>
+
+  <!-- TABLA ACTIVOS -->
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="card-title" style="margin-bottom:0">📋 Posiciones actuales</div>
+      <button class="btn btn-primary btn-sm" onclick="abrirModalActualizar()">✏️ Actualizar valores</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="activos-table" id="activosTable">
         <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Concepto / Activo</th>
-                <th style="text-align: right;">Importe</th>
-                <th style="text-align: center;">Acciones</th>
-            </tr>
+          <tr>
+            <th>Activo</th>
+            <th>Categoría</th>
+            <th>Plataforma</th>
+            <th>Objetivo</th>
+            <th>Aportado</th>
+            <th>Valor actual</th>
+            <th>Rentab. %</th>
+            <th>DCA €/mes</th>
+          </tr>
         </thead>
-        <tbody id="lista-aportaciones">
-            <!-- Las filas se renderizan dinámicamente -->
-        </tbody>
-    </table>
+        <tbody id="activosTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- REGISTRO DCA MES A MES -->
+    <div class="card">
+      <div class="card-title">📅 Registro de aportaciones DCA</div>
+      <div class="dca-registro" id="dcaRegistro"></div>
+    </div>
+
+    <!-- NOTA ESTRATEGIA -->
+    <div>
+      <div class="card">
+        <div class="card-title">📝 Estrategia</div>
+        <div class="nota-estrategia">
+          <strong>DCA Táctico de 10 meses</strong> para desplegar 20.000 € de capital inicial líquido a razón de <strong>2.000 €/mes</strong>.<br><br>
+          🇺🇸 <strong>S&P 500</strong> — 500€/mes (25%) — Motor principal<br>
+          🇪🇺 <strong>Europa</strong> — 250€/mes (12,5%) — Diversificación geográfica<br>
+          🇮🇳 <strong>India</strong> — 150€/mes (7,5%) — Crecimiento emergente<br>
+          🇨🇳 <strong>China</strong> — 100€/mes (5%) — Exposición asiática<br>
+          🥇 <strong>Oro</strong> — 350€/mes (20%) — Refugio y cobertura<br>
+          💧 <strong>Liquidez</strong> — 650€/mes (30%) — Buffer táctico remunerado<br><br>
+          Una vez completados los 10 meses, la cartera entra en <strong>fase de mantenimiento y rebalanceo periódico</strong>.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔔 Posiciones iniciales</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8F9FF;border-radius:10px">
+            <span style="font-size:13px">🇺🇸 S&P 500 (MyInvestor)</span>
+            <strong style="color:var(--primary)">2.500 €</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8F9FF;border-radius:10px">
+            <span style="font-size:13px">💧 Efectivo remunerado (MyInvestor)</span>
+            <strong style="color:var(--green)">3.500 €</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8F9FF;border-radius:10px">
+            <span style="font-size:13px">💧 Efectivo remunerado (Trade Republic)</span>
+            <strong style="color:var(--green)">2.600 €</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#FEE2E2;border-radius:10px">
+            <span style="font-size:13px">🔒 Fondo emergencia (Citibank)</span>
+            <strong style="color:var(--red)">15.000 € — INMÓVIL</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACTUALIZAR VALORES -->
+<div class="modal-overlay" id="modalActualizar">
+  <div class="modal">
+    <h3>✏️ Actualizar valor actual</h3>
+    <div id="modalActivosForms"></div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalActualizar')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarValores()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL APORTACIÓN DCA -->
+<div class="modal-overlay" id="modalAportacion">
+  <div class="modal">
+    <h3>➕ Registrar aportación mensual</h3>
+    <div class="modal-field">
+      <label>Mes de aportación</label>
+      <select id="aportMes" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none">
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Importe ejecutado (€)</label>
+      <input type="number" id="aportImporte" value="2000" min="0" step="100" />
+    </div>
+    <div class="modal-field">
+      <label>Notas (opcional)</label>
+      <input type="text" id="aportNota" placeholder="Ej: ejecutado el día 5..." />
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalAportacion')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarAportacion()">✅ Confirmar</button>
+    </div>
+  </div>
 </div>
 
 <script>
-    // LISTA DE ACTIVOS
-    const ACTIVOS = [
-        { id: 'sp500', nombre: 'Fidelity S&P 500 Index Fund P Acc', ticker: 'IE00BYX5NX33', emoji: '🇺🇸', categoria: 'rv' },
-        { id: 'europa', nombre: 'Vanguard European Stock Index EUR Acc', ticker: 'IE00B945VV12', emoji: '🇪🇺', categoria: 'rv' },
-        { id: 'india', nombre: 'Franklin India Fund Class A Acc', ticker: 'LU0231205187', emoji: '🇮🇳', categoria: 'rv' },
-        { id: 'china', nombre: 'Franklin FTSE China Index Fund Acc', ticker: 'IE00BHZRR150', emoji: '🇨🇳', categoria: 'rv' },
-        { id: 'oro', nombre: 'iShares Physical Gold ETC', ticker: 'IE00B4ND3602', emoji: '🥇', categoria: 'oro' },
-        { id: 'liquidez_mi', nombre: 'Efectivo Remunerado / Groupama Trésorerie IC', ticker: 'Monetario', emoji: '💧', categoria: 'liquidez' },
-        { id: 'liquidez_tr', nombre: 'Efectivo Remunerado Trade Republic', ticker: '2.5% TAE', emoji: '💧', categoria: 'liquidez' }
-    ];
+const ACTIVOS = [
+  {
+    id: 'sp500',
+    nombre: 'Fidelity S&P 500 Index Fund P Acc',
+    ticker: 'IE00BYX5NX33',
+    emoji: '🇺🇸',
+    categoria: 'rv',
+    catLabel: 'Renta Variable',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    dcaMensual: 500,
+    pctObjetivo: 25,
+    color: '#6C63FF',
+    posicionInicial: 2500,
+  },
+  {
+    id: 'europa',
+    nombre: 'Vanguard European Stock Index EUR Acc',
+    ticker: 'IE00B945VV12',
+    emoji: '🇪🇺',
+    categoria: 'rv',
+    catLabel: 'Renta Variable',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    dcaMensual: 250,
+    pctObjetivo: 12.5,
+    color: '#3B82F6',
+    posicionInicial: 0,
+  },
+  {
+    id: 'india',
+    nombre: 'Franklin India Fund Class A Acc',
+    ticker: 'LU0231205187',
+    emoji: '🇮🇳',
+    categoria: 'rv',
+    catLabel: 'Renta Variable',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    dcaMensual: 150,
+    pctObjetivo: 7.5,
+    color: '#F97316',
+    posicionInicial: 0,
+  },
+  {
+    id: 'china',
+    nombre: 'Franklin FTSE China Index Fund Acc',
+    ticker: 'IE00BHZRR150',
+    emoji: '🇨🇳',
+    categoria: 'rv',
+    catLabel: 'Renta Variable',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    dcaMensual: 100,
+    pctObjetivo: 5,
+    color: '#EF4444',
+    posicionInicial: 0,
+  },
+  {
+    id: 'oro',
+    nombre: 'iShares Physical Gold ETC',
+    ticker: 'IE00B4ND3602',
+    emoji: '🥇',
+    categoria: 'oro',
+    catLabel: 'Oro / Refugio',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    dcaMensual: 350,
+    pctObjetivo: 20,
+    color: '#F59E0B',
+    posicionInicial: 0,
+  },
+  {
+    id: 'liquidez_mi',
+    nombre: 'Efectivo Remunerado / Groupama Trésorerie IC',
+    ticker: 'Monetario',
+    emoji: '💧',
+    categoria: 'liquid',
+    catLabel: 'Liquidez Táctica',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    dcaMensual: 0,
+    pctObjetivo: 0,
+    color: '#10B981',
+    posicionInicial: 3500,
+    esLiquidez: true,
+  },
+  {
+    id: 'liquidez_tr',
+    nombre: 'Efectivo Remunerado Trade Republic',
+    ticker: '2,5% TAE',
+    emoji: '💧',
+    categoria: 'liquid',
+    catLabel: 'Liquidez Táctica',
+    plataforma: 'trade',
+    platLabel: 'Trade Republic',
+    dcaMensual: 0,
+    pctObjetivo: 0,
+    color: '#34D399',
+    posicionInicial: 2600,
+    esLiquidez: true,
+  },
+];
 
-    const DCA_MESES = ['Nov 2026', 'Dic 2026', 'Ene 2027', 'Feb 2027', 'Mar 2027', 'Abr 2027', 'May 2027', 'Jun 2027', 'Jul 2027', 'Ago 2027'];
-    const DCA_OBJETIVO = 20000;
-    const DCA_MENS_IMPORTE = 2000;
+const DCA_MESES = [
+  'Nov 2026','Dic 2026','Ene 2027','Feb 2027','Mar 2027',
+  'Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027'
+];
+const DCA_OBJETIVO   = 20000;
+const DCA_MENS_IMPORTE = 2000;
 
-    let misAportaciones = [];
+function getData() {
+  try { return JSON.parse(localStorage.getItem('portfolio_data') || '{}'); }
+  catch(e) { return {}; }
+}
 
-    function getData() { 
-        try { return JSON.parse(localStorage.getItem('portfolio_data')) || {}; } 
-        catch(e) { return {}; } 
-    }
+function saveDataLocal(d) {
+  try { localStorage.setItem('portfolio_data', JSON.stringify(d)); } catch(e){}
+}
 
-    function fmtK(val) {
-        return (val || 0).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
-    }
+function saveData(d) {
+  saveDataLocal(d);
+  if (typeof window.saveDataCloud === 'function') {
+    window.saveDataCloud(d);
+  }
+}
 
-    // CÁLCULO DE KPIS Y TOTALES
-    function calcularTotales() {
-        let totalValor = 0;
-        let totalAportado = 0;
-        let totalLiquidez = 0;
-
-        misAportaciones.forEach(item => {
-            const monto = parseFloat(item.monto || item.importe || 0);
-            totalAportado += monto;
-            totalValor += monto;
-            if (item.categoria === 'liquidez' || item.esLiquidez) {
-                totalLiquidez += monto;
-            }
-        });
-
-        const ganancia = totalValor - totalAportado;
-        const rentabPct = totalAportado > 0 ? (ganancia / totalAportado) * 100 : 0;
-
-        const kpiTotal = document.getElementById('kpiTotal');
-        const kpiInvertido = document.getElementById('kpiInvertido');
-        const kpiRentab = document.getElementById('kpiRentab');
-        const kpiRentabEur = document.getElementById('kpiRentabEur');
-        const kpiLiquidez = document.getElementById('kpiLiquidez');
-
-        if (kpiTotal) kpiTotal.textContent = fmtK(totalValor);
-        if (kpiInvertido) kpiInvertido.textContent = fmtK(totalAportado);
-        if (kpiRentab) {
-            kpiRentab.textContent = (rentabPct >= 0 ? '+' : '') + rentabPct.toFixed(2) + '%';
-            kpiRentab.style.color = rentabPct >= 0 ? '#2e7d32' : '#c62828';
-        }
-        if (kpiRentabEur) kpiRentabEur.textContent = (ganancia >= 0 ? '+' : '') + fmtK(ganancia);
-        if (kpiLiquidez) kpiLiquidez.textContent = fmtK(totalLiquidez);
-    }
-
-    // DIBUJAR TABLA CON BOTÓN DE BORRADO
-    function renderTabla() {
-        const contenedor = document.getElementById('lista-aportaciones') || document.getElementById('tabla-aportaciones') || document.getElementById('historial');
-        if (!contenedor) return;
-
-        contenedor.innerHTML = '';
-
-        if (!misAportaciones || misAportaciones.length === 0) {
-            contenedor.innerHTML = `
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #888; padding: 15px;">
-                        No hay aportaciones ni ingresos registrados.
-                    </td>
-                </tr>`;
-            return;
-        }
-
-        misAportaciones.forEach(item => {
-            const fila = document.createElement('tr');
-            const fechaFormateada = item.fecha ? new Date(item.fecha).toLocaleDateString('es-ES') : '-';
-            const importeFormateado = fmtK(item.monto || item.importe || 0);
-
-            fila.innerHTML = `
-                <td>${fechaFormateada}</td>
-                <td><strong>${item.concepto || item.activo || 'Aportación'}</strong></td>
-                <td style="text-align: right; font-weight: bold;">${importeFormateado}</td>
-                <td style="text-align: center;">
-                    <button class="btn-borrar" onclick="borrarAportacion('${item.id}')" title="Eliminar registro">
-                        🗑️ Borrar
-                    </button>
-                </td>
-            `;
-
-            contenedor.appendChild(fila);
-        });
-    }
-
-    // ELIMINACIÓN DE APORTACIÓN EN FIRESTORE
-    async function borrarAportacion(idAportacion) {
-        if (!idAportacion) return;
-
-        const confirmar = confirm("¿Estás seguro de que deseas eliminar este ingreso/aportación?");
-        if (!confirmar) return;
-
-        try {
-            // Intentar borrar en Firestore si Firebase está inicializado
-            if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                await firebase.firestore().collection('aportaciones').doc(idAportacion).delete();
-            }
-
-            // Actualizar lista en memoria
-            misAportaciones = misAportaciones.filter(item => item.id !== idAportacion);
-
-            // Guardar también copia local si se usa localStorage
-            localStorage.setItem('aportaciones_backup', JSON.stringify(misAportaciones));
-
-            // Actualizar interfaz y totales
-            renderTabla();
-            calcularTotales();
-
-            console.log(`[OK] Aportación ${idAportacion} eliminada correctamente.`);
-        } catch (error) {
-            console.error("Error al borrar el registro:", error);
-            alert("Ocurrió un error al intentar borrar el registro en Firestore.");
-        }
-    }
-
-    // INICIALIZACIÓN / CARGA DE DATOS DESDE FIRESTORE
-    async function cargarDatosFirestore() {
-        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-            try {
-                const snapshot = await firebase.firestore().collection('aportaciones').get();
-                misAportaciones = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-            } catch(e) {
-                console.warn("Cargando desde almacenamiento local por fallback:", e);
-                misAportaciones = JSON.parse(localStorage.getItem('aportaciones_backup')) || [];
-            }
-        }
-        renderTabla();
-        calcularTotales();
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        cargarDatosFirestore();
+function getPortfolio() {
+  const d = getData();
+  if (!d.portfolio) {
+    d.portfolio = {};
+    ACTIVOS.forEach(a => {
+      d.portfolio[a.id] = {
+        valorActual: a.posicionInicial,
+        totalAportado: a.posicionInicial,
+        lastUpdate: null,
+      };
     });
+    saveDataLocal(d);
+  }
+  return d.portfolio;
+}
+
+function getAportaciones() {
+  const d = getData();
+  if (!d.aportaciones) { d.aportaciones = []; saveDataLocal(d); }
+  return d.aportaciones;
+}
+
+function fmt(n) {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+function fmtK(n) {
+  if (Math.abs(n) >= 1000) return (n/1000).toLocaleString('es-ES',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' K€';
+  return fmt(n);
+}
+
+function renderDCA() {
+  const aports = getAportaciones();
+  const ejecutados = aports.filter(a => a.ejecutado).length;
+  const totalAportado = aports.filter(a => a.ejecutado).reduce((s,a) => s + a.importe, 0);
+  const pct = Math.min((totalAportado / DCA_OBJETIVO) * 100, 100);
+
+  document.getElementById('dcaBarFill').style.width = pct + '%';
+  document.getElementById('dcaBigPct').textContent = pct.toFixed(0) + '%';
+  document.getElementById('dcaAportadoLabel').textContent = fmtK(totalAportado) + ' aportados';
+  document.getElementById('dcaMesesLabel').textContent = ejecutados + ' / 10 meses';
+
+  const wrap = document.getElementById('dcaMonths');
+  wrap.innerHTML = '';
+  DCA_MESES.forEach((mes, i) => {
+    const aport = aports.find(a => a.mes === mes);
+    const ejecutado = aport && aport.ejecutado;
+    const esActual  = i === ejecutados && ejecutados < 10;
+    const div = document.createElement('div');
+    div.className = 'dca-month-dot ' + (ejecutado ? 'done' : esActual ? 'active' : 'pending');
+    div.title = mes + (ejecutado ? ' ✓ ' + fmt(aport.importe) : ' — pendiente');
+    div.textContent = i + 1;
+    div.onclick = () => { if (!ejecutado) { document.getElementById('aportMes').value = mes; abrirModalAportacion(); } };
+    wrap.appendChild(div);
+  });
+
+  renderRegistroDCA(aports, ejecutados);
+}
+
+function renderRegistroDCA(aports, ejecutados) {
+  const wrap = document.getElementById('dcaRegistro');
+  wrap.innerHTML = '';
+  DCA_MESES.forEach((mes, i) => {
+    const aport = aports.find(a => a.mes === mes);
+    const ejecutado = aport && aport.ejecutado;
+    const div = document.createElement('div');
+    div.className = 'dca-aport-row ' + (ejecutado ? 'ejecutado' : 'pendiente');
+    div.innerHTML = `
+      <div>
+        <div class="dca-aport-mes">${i+1}. ${mes}</div>
+        ${aport && aport.nota ? `<div style="font-size:11px;color:var(--text-muted)">${aport.nota}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="dca-aport-importe ${ejecutado ? 'ejecutado' : 'pendiente'}">
+          ${ejecutado ? '+' + fmt(aport.importe) : fmt(DCA_MENS_IMPORTE) + ' previsto'}
+        </span>
+        ${ejecutado
+          ? `<button class="btn btn-danger btn-sm" onclick="borrarAportacion('${mes}')" title="Borrar aportación">🗑️ Borrar</button>`
+          : `<button class="btn btn-primary btn-sm" onclick="abrirModalAportacionMes('${mes}')">Registrar</button>`
+        }
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+// FUNCIÓN PARA BORRAR APORTACIÓN/INGRESO
+function borrarAportacion(mes) {
+  if (!confirm(`¿Estás seguro de que deseas eliminar el registro de la aportación de ${mes}?`)) return;
+
+  const d = getData();
+  if (d.aportaciones) {
+    d.aportaciones = d.aportaciones.filter(a => a.mes !== mes);
+    saveData(d);
+    renderAll();
+  }
+}
+
+function renderKPIs() {
+  const p = getPortfolio();
+  let totalValor = 0, totalAportado = 0, totalLiquidez = 0;
+
+  ACTIVOS.forEach(a => {
+    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
+    totalValor    += pos.valorActual;
+    totalAportado += pos.totalAportado;
+    if (a.esLiquidez) totalLiquidez += pos.valorActual;
+  });
+  const totalConEmergencia = totalValor + 15000;
+
+  const ganancia = totalValor - totalAportado;
+  const rentabPct = totalAportado > 0 ? (ganancia / totalAportado) * 100 : 0;
+
+  document.getElementById('kpiTotal').textContent = fmtK(totalConEmergencia);
+  document.getElementById('kpiInvertido').textContent = fmtK(totalAportado);
+  document.getElementById('kpiRentab').textContent = (rentabPct >= 0 ? '+' : '') + rentabPct.toFixed(2) + '%';
+  document.getElementById('kpiRentab').style.color = rentabPct >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('kpiRentabEur').textContent = (ganancia >= 0 ? '+' : '') + fmtK(ganancia);
+  document.getElementById('kpiLiquidez').textContent = fmtK(totalLiquidez);
+}
+
+function renderTabla() {
+  const p = getPortfolio();
+  const tbody = document.getElementById('activosTbody');
+  tbody.innerHTML = '';
+
+  let totAportado = 0, totValor = 0;
+  ACTIVOS.forEach(a => {
+    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
+    const ganancia = pos.valorActual - pos.totalAportado;
+    const rentPct  = pos.totalAportado > 0 ? (ganancia / pos.totalAportado) * 100 : 0;
+    totAportado += pos.totalAportado;
+    totValor    += pos.valorActual;
+
+    const rentClass = rentPct > 0.5 ? 'rentab-pos' : rentPct < -0.5 ? 'rentab-neg' : 'rentab-neu';
+    const rentStr   = pos.totalAportado > 0
+      ? `<span class="rentab-pct ${rentClass}">${rentPct >= 0 ? '+' : ''}${rentPct.toFixed(2)}%</span>`
+      : '<span class="rentab-pct rentab-neu">—</span>';
+
+    const platClass = a.plataforma === 'myinvestor' ? 'plat-myinvestor'
+                    : a.plataforma === 'trade' ? 'plat-trade' : 'plat-citibank';
+    const catClass  = a.categoria === 'rv' ? 'cat-rv' : a.categoria === 'oro' ? 'cat-oro'
+                    : a.categoria === 'liquid' ? 'cat-liquid' : 'cat-emerg';
+    const dcaStr    = a.dcaMensual > 0 ? `<strong style="color:var(--primary)">${fmt(a.dcaMensual)}</strong>` : '<span style="color:var(--text-muted)">—</span>';
+    const pctStr    = a.pctObjetivo > 0 ? `<span style="font-size:11px;color:var(--text-muted)">${a.pctObjetivo}%</span>` : '<span style="color:var(--text-muted)">—</span>';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="activo-nombre">${a.emoji} ${a.nombre.length > 32 ? a.nombre.substring(0,32)+'…' : a.nombre}</div>
+        <div class="activo-ticker">${a.ticker}</div>
+      </td>
+      <td><span class="badge-categoria ${catClass}">${a.catLabel}</span></td>
+      <td><span class="activo-plat ${platClass}">${a.platLabel}</span></td>
+      <td>${pctStr}</td>
+      <td style="font-weight:600">${pos.totalAportado > 0 ? fmtK(pos.totalAportado) : '—'}</td>
+      <td><span class="valor-actual">${pos.valorActual > 0 ? fmtK(pos.valorActual) : '—'}</span></td>
+      <td>${rentStr}</td>
+      <td>${dcaStr}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const totGanancia = totValor - totAportado;
+  const totRent = totAportado > 0 ? (totGanancia / totAportado) * 100 : 0;
+  const tr = document.createElement('tr');
+  tr.style.cssText = 'font-weight:900;background:#F8F9FF';
+  tr.innerHTML = `
+    <td colspan="4" style="font-weight:900;font-size:14px">TOTAL CARTERA (sin emergencia)</td>
+    <td style="font-weight:900">${fmtK(totAportado)}</td>
+    <td style="font-weight:900;color:var(--primary)">${fmtK(totValor)}</td>
+    <td><span class="rentab-pct ${totRent >= 0 ? 'rentab-pos' : 'rentab-neg'}">${totRent >= 0 ? '+' : ''}${totRent.toFixed(2)}%</span></td>
+    <td style="color:var(--primary);font-weight:900">2.000 €</td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function renderDonut() {
+  const canvas = document.getElementById('donutCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 180, H = 180, cx = 90, cy = 90, R = 75, r = 48;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const segmentos = ACTIVOS.filter(a => a.pctObjetivo > 0).map(a => ({
+    pct: a.pctObjetivo, color: a.color, label: a.emoji + ' ' + a.nombre.split(' ')[0],
+    importe: a.dcaMensual,
+  }));
+  segmentos.push({ pct: 30, color: '#10B981', label: '💧 Liquidez', importe: 650 });
+
+  let startAngle = -Math.PI / 2;
+  segmentos.forEach(s => {
+    const angle = (s.pct / 100) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, R, startAngle, startAngle + angle);
+    ctx.closePath();
+    ctx.fillStyle = s.color;
+    ctx.fill();
+    startAngle += angle;
+  });
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+
+  const leyDiv = document.getElementById('donutLeyenda');
+  leyDiv.innerHTML = '';
+  segmentos.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'ley-item';
+    div.innerHTML = `
+      <div class="ley-dot" style="background:${s.color}"></div>
+      <span class="ley-name">${s.label}</span>
+      <span class="ley-pct" style="color:${s.color}">${s.pct}%</span>
+    `;
+    leyDiv.appendChild(div);
+  });
+}
+
+function renderPlataformas() {
+  const p = getPortfolio();
+  const plats = {
+    myinvestor: { nombre: 'MyInvestor', emoji: '🟣', color: '#6C63FF', total: 0, tipos: 'Fondos · Oro · Liquidez' },
+    trade:      { nombre: 'Trade Republic', emoji: '🟢', color: '#10B981', total: 0, tipos: 'Efectivo remunerado 2,5%' },
+    citibank:   { nombre: 'Citibank', emoji: '🔵', color: '#3B82F6', total: 15000, tipos: 'Fondo emergencia 3,0% TAE' },
+  };
+
+  ACTIVOS.forEach(a => {
+    const pos = p[a.id] || { valorActual: 0 };
+    if (plats[a.plataforma]) plats[a.plataforma].total += pos.valorActual;
+  });
+
+  const totalGeneral = Object.values(plats).reduce((s, pl) => s + pl.total, 0);
+
+  const wrap = document.getElementById('plataformasWrap');
+  wrap.innerHTML = '';
+  Object.entries(plats).forEach(([key, pl]) => {
+    const pct = totalGeneral > 0 ? (pl.total / totalGeneral) * 100 : 0;
+    const div = document.createElement('div');
+    div.className = 'plat-card';
+    div.innerHTML = `
+      <div class="plat-header">
+        <div class="plat-logo" style="background:${pl.color}20">${pl.emoji}</div>
+        <div>
+          <div class="plat-nombre">${pl.nombre}</div>
+          <div class="plat-tipo">${pl.tipos}</div>
+        </div>
+      </div>
+      <div>
+        <div class="plat-total" style="color:${pl.color}">${fmtK(pl.total)}</div>
+        <div class="plat-sub">${pct.toFixed(1)}% del total</div>
+        <div class="plat-bar"><div class="plat-bar-fill" style="width:${pct}%;background:${pl.color}"></div></div>
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+function abrirModalActualizar() {
+  const p = getPortfolio();
+  const form = document.getElementById('modalActivosForms');
+  form.innerHTML = '';
+  ACTIVOS.forEach(a => {
+    const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
+    const div = document.createElement('div');
+    div.className = 'modal-field';
+    div.innerHTML = `
+      <label>${a.emoji} ${a.nombre.substring(0,40)}</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <input type="number" id="val_${a.id}" placeholder="Valor actual €" value="${pos.valorActual || ''}" min="0" step="0.01" />
+        <input type="number" id="aport_${a.id}" placeholder="Total aportado €" value="${pos.totalAportado || ''}" min="0" step="0.01" />
+      </div>
+      <div style="display:flex;gap:6px;font-size:10px;color:var(--text-muted);margin-top:3px">
+        <span style="flex:1;text-align:center">Valor actual</span>
+        <span style="flex:1;text-align:center">Total aportado</span>
+      </div>
+    `;
+    form.appendChild(div);
+  });
+  document.getElementById('modalActualizar').classList.add('open');
+}
+
+function guardarValores() {
+  const d = getData();
+  if (!d.portfolio) d.portfolio = {};
+  ACTIVOS.forEach(a => {
+    const val = parseFloat(document.getElementById('val_' + a.id).value) || 0;
+    const aport = parseFloat(document.getElementById('aport_' + a.id).value) || 0;
+    d.portfolio[a.id] = { valorActual: val, totalAportado: aport, lastUpdate: new Date().toISOString() };
+  });
+  saveData(d);
+  cerrarModal('modalActualizar');
+  renderAll();
+}
+
+function abrirModalAportacion() {
+  const sel = document.getElementById('aportMes');
+  sel.innerHTML = DCA_MESES.map(m => `<option value="${m}">${m}</option>`).join('');
+  document.getElementById('aportImporte').value = DCA_MENS_IMPORTE;
+  document.getElementById('aportNota').value = '';
+  document.getElementById('modalAportacion').classList.add('open');
+}
+
+function abrirModalAportacionMes(mes) {
+  const sel = document.getElementById('aportMes');
+  sel.innerHTML = DCA_MESES.map(m => `<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
+  document.getElementById('aportImporte').value = DCA_MENS_IMPORTE;
+  document.getElementById('aportNota').value = '';
+  document.getElementById('modalAportacion').classList.add('open');
+}
+
+function guardarAportacion() {
+  const mes     = document.getElementById('aportMes').value;
+  const importe = parseFloat(document.getElementById('aportImporte').value) || 0;
+  const nota    = document.getElementById('aportNota').value.trim();
+  if (importe <= 0) { alert('Introduce un importe válido'); return; }
+
+  const d = getData();
+  if (!d.aportaciones) d.aportaciones = [];
+  const idx = d.aportaciones.findIndex(a => a.mes === mes);
+  const entry = { mes, importe, nota, ejecutado: true, fecha: new Date().toISOString() };
+  if (idx >= 0) d.aportaciones[idx] = entry;
+  else d.aportaciones.push(entry);
+  saveData(d);
+  cerrarModal('modalAportacion');
+  renderAll();
+}
+
+function cerrarModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+function renderAll() {
+  renderDCA();
+  renderKPIs();
+  renderTabla();
+  renderDonut();
+  renderPlataformas();
+}
+
+window.renderAll = renderAll;
+renderAll();
 </script>
 
+<!-- FIREBASE SDK (COMPAT) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
+  authDomain: "mis-finanzas-85c47.firebaseapp.com",
+  projectId: "mis-finanzas-85c47",
+  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
+  messagingSenderId: "584441374984",
+  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db      = firebase.firestore();
+const DOC_REF = db.collection('usuarios').doc('miquel_portfolio');
+let _syncBlocked = false;
+
+function setSyncStatus(estado) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (estado === 'ok')      { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
+  if (estado === 'saving')  { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
+  if (estado === 'error')   { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
+  if (estado === 'loading') { el.textContent = '🔄 Cargando...';  el.style.color = '#aaa'; }
+}
+
+function saveDataCloud(d) {
+  saveDataLocal(d);
+  setSyncStatus('saving');
+  _syncBlocked = true;
+  DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
+    .then(() => {
+      setSyncStatus('ok');
+      setTimeout(() => { _syncBlocked = false; }, 1200);
+    })
+    .catch((err) => {
+      console.error("Firebase Sync Error:", err);
+      setSyncStatus('error');
+      _syncBlocked = false;
+    });
+}
+
+window.saveDataCloud = saveDataCloud;
+
+setSyncStatus('loading');
+DOC_REF.onSnapshot(snap => {
+  if (_syncBlocked) return;
+  if (snap.exists) {
+    try {
+      const remoteData = JSON.parse(snap.data().data);
+      saveDataLocal(remoteData);
+      if (typeof renderAll === 'function') renderAll();
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  } else {
+    setSyncStatus('ok');
+  }
+}, (err) => {
+  console.error("Snapshot error:", err);
+  setSyncStatus('error');
+});
+</script>
 </body>
 </html>
