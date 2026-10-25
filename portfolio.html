@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -201,18 +202,26 @@ const pc=n=>(n>=0?'+':'')+n.toFixed(2)+'%';
 let editId=null;
 
 /* ---------- DATOS ---------- */
+let STATE=null;
 function saveLocal(d){try{localStorage.setItem('portfolio_data',JSON.stringify(d))}catch(e){}}
-function getData(){
-  let d={};try{d=JSON.parse(localStorage.getItem('portfolio_data')||'{}')}catch(e){}
-  let ch=false;
+function normalize(d){
+  d=d&&typeof d==='object'?d:{};
   if(!Array.isArray(d.positions)){ // migración desde el formato antiguo
     d.positions=DEF.map(p=>{const o=d.portfolio&&d.portfolio[p.id==='liq_mi'?'liquidez_mi':p.id==='liq_tr'?'liquidez_tr':p.id];
-      return o?{...p,valor:o.valorActual,aport:o.totalAportado}:{...p}});ch=true;}
-  if(!Array.isArray(d.aportaciones)){d.aportaciones=[];ch=true}
-  if(ch)saveLocal(d);
+      return o?{...p,valor:o.valorActual,aport:o.totalAportado}:{...p}});}
+  if(!Array.isArray(d.aportaciones))d.aportaciones=[];
   return d;
 }
-function saveData(d){saveLocal(d);if(typeof window.saveDataCloud==='function')window.saveDataCloud(d);render();}
+function getData(){
+  if(STATE)return STATE;
+  let d={};try{d=JSON.parse(localStorage.getItem('portfolio_data')||'{}')}catch(e){}
+  return STATE=normalize(d);
+}
+function saveData(d){
+  d._ts=Date.now();STATE=d;saveLocal(d);
+  try{render()}catch(e){console.error(e);alert('Error al pintar: '+e.message)}
+  if(typeof window.saveDataCloud==='function')window.saveDataCloud(d);
+}
 const inv=d=>d.positions.filter(p=>p.cat!=='emerg');
 const colorOf=(p,i)=>p.color||COLS[i%COLS.length];
 
@@ -376,25 +385,27 @@ const firebaseConfig={
 };
 firebase.initializeApp(firebaseConfig);
 const DOC_REF=firebase.firestore().collection('usuarios').doc('miquel_portfolio');
-let _blk=false;
-function setSync(s){
+function setSync(s,msg){
   const el=document.getElementById('sync');if(!el)return;
-  const m={ok:['☁️ Sincronizado','#2ECC71'],saving:['⏳ Guardando...','#F39C12'],error:['⚠️ Sin conexión','#E74C3C'],loading:['🔄 Cargando...','#aaa']}[s];
+  const m={ok:['☁️ Sincronizado','#2ECC71'],saving:['⏳ Guardando...','#F39C12'],error:['⚠️ '+(msg||'Sin conexión'),'#E74C3C'],loading:['🔄 Cargando...','#aaa']}[s];
   el.textContent=m[0];el.style.color=m[1];
 }
 window.saveDataCloud=function(d){
-  setSync('saving');_blk=true;
-  DOC_REF.set({data:JSON.stringify(d),ts:Date.now()})
-    .then(()=>{setSync('ok');setTimeout(()=>{_blk=false},1200)})
-    .catch(e=>{console.error('Firebase:',e);setSync('error');_blk=false});
+  setSync('saving');
+  DOC_REF.set({data:JSON.stringify(d),ts:d._ts||Date.now()})
+    .then(()=>setSync('ok'))
+    .catch(e=>{console.error('Firebase:',e);setSync('error','No guardado en la nube ('+(e.code||'error')+')')});
 };
 setSync('loading');
 DOC_REF.onSnapshot(snap=>{
-  if(_blk)return;
-  if(snap.exists){
-    try{saveLocal(JSON.parse(snap.data().data));render();setSync('ok')}catch(e){setSync('error')}
-  }else setSync('ok');
-},e=>{console.error(e);setSync('error')});
+  if(snap.metadata.hasPendingWrites)return;          // eco de nuestra propia escritura
+  if(!snap.exists){setSync('ok');return}
+  try{
+    const raw=snap.data(),r=normalize(JSON.parse(raw.data)),rts=r._ts||raw.ts||0;
+    if(rts>(getData()._ts||0)){r._ts=rts;STATE=r;saveLocal(r);render()} // solo si lo remoto es más nuevo
+    setSync('ok');
+  }catch(e){console.error(e);setSync('error','Datos remotos no válidos')}
+},e=>{console.error(e);setSync('error','Sin acceso a la nube ('+(e.code||'error')+')')});
 </script>
 </body>
 </html>
