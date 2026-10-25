@@ -1,13 +1,734 @@
-<!-- HEADER REVISADO -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Inversión</title>
+<style>
+:root {
+  --primary: #6C63FF;
+  --primary-dk: #5A52D5;
+  --primary-lt: #EDE9FE;
+  --green: #10B981;
+  --green-lt: #D1FAE5;
+  --yellow: #F59E0B;
+  --yellow-lt: #FEF3C7;
+  --red: #EF4444;
+  --red-lt: #FEE2E2;
+  --bg: #F0F2F5;
+  --card: #FFFFFF;
+  --text: #1E293B;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); }
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg,#1E293B 0%,#334155 100%);
+  color:#fff; padding:28px 36px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+.header h1 { font-size:26px; font-weight:900; }
+.header p  { font-size:13px; opacity:.7; margin-top:3px; }
+.nav-links { display:flex; gap:12px; align-items:center; }
+.nav-link {
+  padding:8px 18px; border-radius:20px; font-size:13px; font-weight:600;
+  text-decoration:none; border:2px solid rgba(255,255,255,.3); color:#fff;
+  transition:all .2s;
+}
+.nav-link:hover { background:rgba(255,255,255,.15); }
+.nav-link.active { background:var(--primary); border-color:var(--primary); }
+
+/* LAYOUT */
+.container { max-width:1200px; margin:0 auto; padding:32px 24px; }
+.main-grid { display:grid; grid-template-columns:380px 1fr; gap:24px; align-items:start; }
+
+/* CARDS */
+.card {
+  background:var(--card); border-radius:16px;
+  padding:24px; box-shadow:0 2px 16px rgba(0,0,0,.06);
+  margin-bottom:20px;
+}
+.card:last-child { margin-bottom:0; }
+.card-title {
+  font-size:13px; font-weight:800; text-transform:uppercase;
+  letter-spacing:1.2px; color:var(--text-muted);
+  margin-bottom:18px; display:flex; align-items:center; gap:8px;
+}
+
+/* FORM */
+.field { margin-bottom:14px; }
+.field label {
+  display:block; font-size:12px; font-weight:700;
+  color:var(--text-muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:.5px;
+}
+.field input, .field select {
+  width:100%; padding:11px 14px; border:1.5px solid var(--border);
+  border-radius:10px; font-size:15px; color:var(--text);
+  outline:none; transition:border .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus {
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(108,99,255,.12);
+}
+.field .hint { font-size:11px; color:var(--text-muted); margin-top:4px; }
+
+/* SLIDER */
+.slider-wrap { display:flex; align-items:center; gap:12px; }
+.slider-wrap input[type=range] {
+  flex:1; height:6px; accent-color:var(--primary);
+  padding:0; border:none; box-shadow:none;
+}
+.slider-val {
+  min-width:54px; text-align:right; font-size:15px;
+  font-weight:800; color:var(--primary);
+}
+
+/* FONDOS PRESET */
+.fondos-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px; }
+.fondo-btn {
+  padding:10px 8px; border:2px solid var(--border); border-radius:10px;
+  background:#fff; cursor:pointer; transition:all .2s;
+  text-align:center;
+}
+.fondo-btn:hover { border-color:var(--primary); }
+.fondo-btn.selected { border-color:var(--primary); background:var(--primary-lt); }
+.fondo-btn .fondo-nombre { font-size:12px; font-weight:700; color:var(--text); }
+.fondo-btn .fondo-rentab { font-size:14px; font-weight:900; color:var(--green); }
+.fondo-btn .fondo-tipo { font-size:10px; color:var(--text-muted); margin-top:2px; }
+
+/* BTN */
+.btn {
+  width:100%; padding:14px; border:none; border-radius:12px;
+  font-size:15px; font-weight:800; cursor:pointer;
+  background:var(--primary); color:#fff; transition:all .2s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn:hover { background:var(--primary-dk); transform:translateY(-1px); box-shadow:0 4px 16px rgba(108,99,255,.3); }
+
+/* KPI RESULTADO */
+.kpi-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:20px; }
+.kpi {
+  border-radius:14px; padding:18px;
+  border:2px solid var(--border);
+}
+.kpi.highlight { background:linear-gradient(135deg,var(--primary),#8B80F8); border-color:var(--primary); color:#fff; }
+.kpi-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; opacity:.7; margin-bottom:4px; }
+.kpi-val { font-size:26px; font-weight:900; }
+.kpi.highlight .kpi-val { color:#fff; }
+.kpi-sub { font-size:11px; opacity:.65; margin-top:3px; }
+
+/* TABLA PROGRESIÓN */
+.tabla-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+thead th {
+  text-align:left; font-size:11px; font-weight:800;
+  text-transform:uppercase; letter-spacing:1px; color:var(--text-muted);
+  padding:10px 14px; border-bottom:2px solid var(--border);
+  position:sticky; top:0; background:#fff;
+}
+tbody td { padding:11px 14px; font-size:14px; border-bottom:1px solid var(--border); }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover td { background:#F8F9FF; }
+.td-year { font-weight:800; color:var(--text-muted); }
+.td-capital { font-weight:600; }
+.td-total { font-weight:800; color:var(--primary); font-size:15px; }
+.td-ganancia { font-weight:700; color:var(--green); }
+.td-ganancia.neg { color:var(--red); }
+.td-bar { min-width:120px; }
+.mini-bar { height:8px; border-radius:4px; background:var(--border); overflow:hidden; }
+
+/* CHART CANVAS */
+.chart-container { position:relative; height:280px; margin-bottom:8px; }
+canvas { width:100% !important; }
+
+/* COMPARATIVA */
+.comp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:4px; }
+.comp-card {
+  border-radius:12px; padding:16px; text-align:center;
+  border:2px solid var(--border);
+}
+.comp-card.winner { border-color:var(--green); background:var(--green-lt); }
+.comp-name { font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; }
+.comp-val { font-size:20px; font-weight:900; color:var(--primary); }
+.comp-pct { font-size:13px; font-weight:700; color:var(--green); margin-top:3px; }
+
+/* EMPTY */
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.empty-state .icon { font-size:56px; margin-bottom:14px; }
+.empty-state h3 { font-size:18px; font-weight:700; margin-bottom:6px; }
+.empty-state p { font-size:14px; }
+
+hr { border:none; border-top:1px solid var(--border); margin:16px 0; }
+
+@media(max-width:900px) {
+  .main-grid { grid-template-columns:1fr; }
+  .kpi-grid { grid-template-columns:1fr 1fr; }
+  .comp-grid { grid-template-columns:1fr; }
+  .fondos-grid { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
 <div class="header">
   <div>
     <h1>📈 Simulador de Inversión</h1>
-    <p>Proyecciones a Largo Plazo & Interés Compuesto</p>
+    <p>Interés compuesto · Fondos & ETFs · Proyección a largo plazo</p>
   </div>
   <div class="nav-links">
-    <a href="index.html" class="nav-link">🏠 Índice</a>
     <a href="calculadora-gastos.html" class="nav-link">💰 Gastos</a>
     <a href="simulador-inversion.html" class="nav-link active">📈 Simulador</a>
     <a href="portfolio.html" class="nav-link">💼 Portfolio</a>
+    <div id="syncStatus" style="font-size:12px;color:#aaa;margin-left:8px">🔄 Cargando...</div>
   </div>
 </div>
+
+<div class="container">
+<div class="main-grid">
+
+  <!-- PANEL IZQUIERDO -->
+  <div>
+    <div class="card">
+      <div class="card-title">⚡ Fondos / ETFs populares</div>
+      <div class="fondos-grid" id="fondosGrid"></div>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:8px">
+        * Rentabilidades históricas anualizadas. No garantizan resultados futuros.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙️ Parámetros de simulación</div>
+
+      <div class="field">
+        <label>Capital inicial (€)</label>
+        <input type="number" id="capitalInicial" value="5000" min="0" step="100" />
+        <div class="hint">Cantidad que inviertes al inicio</div>
+      </div>
+
+      <div class="field">
+        <label>Aportación mensual (€)</label>
+        <input type="number" id="aportacionMensual" value="200" min="0" step="50" />
+        <div class="hint">Cuánto añades cada mes</div>
+      </div>
+
+      <div class="field">
+        <label>Rentabilidad anual estimada (%)</label>
+        <div class="slider-wrap">
+          <input type="range" id="rentabilidadSlider" min="1" max="20" step="0.5" value="8"
+            oninput="document.getElementById('rentabilidadVal').textContent=this.value+'%';
+                     document.getElementById('rentabilidadInput').value=this.value;" />
+          <span class="slider-val" id="rentabilidadVal">8%</span>
+        </div>
+        <input type="number" id="rentabilidadInput" value="8" min="0.1" max="50" step="0.1"
+          style="margin-top:8px"
+          oninput="document.getElementById('rentabilidadSlider').value=this.value;
+                   document.getElementById('rentabilidadVal').textContent=this.value+'%';" />
+      </div>
+
+      <div class="field">
+        <label>Horizonte temporal (años)</label>
+        <div class="slider-wrap">
+          <input type="range" id="aniosSlider" min="1" max="40" step="1" value="20"
+            oninput="document.getElementById('aniosVal').textContent=this.value+' años';
+                     document.getElementById('aniosInput').value=this.value;" />
+          <span class="slider-val" id="aniosVal">20 años</span>
+        </div>
+        <input type="number" id="aniosInput" value="20" min="1" max="50" step="1"
+          style="margin-top:8px"
+          oninput="document.getElementById('aniosSlider').value=this.value;
+                   document.getElementById('aniosVal').textContent=this.value+' años';" />
+      </div>
+
+      <div class="field">
+        <label>Inflación anual estimada (%)</label>
+        <div class="slider-wrap">
+          <input type="range" id="inflacionSlider" min="0" max="6" step="0.5" value="2"
+            oninput="document.getElementById('inflacionVal').textContent=this.value+'%';
+                     document.getElementById('inflacionInput').value=this.value;" />
+          <span class="slider-val" id="inflacionVal">2%</span>
+        </div>
+        <input type="number" id="inflacionInput" value="2" min="0" max="10" step="0.1"
+          style="margin-top:8px"
+          oninput="document.getElementById('inflacionSlider').value=this.value;
+                   document.getElementById('inflacionVal').textContent=this.value+'%';" />
+        <div class="hint">Calcula el valor real (ajustado a inflación)</div>
+      </div>
+
+      <hr>
+
+      <button class="btn" onclick="ejecutarCalcular()">
+        🚀 Calcular proyección
+      </button>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div id="resultados">
+    <div class="empty-state">
+      <div class="icon">📊</div>
+      <h3>Configura tu simulación</h3>
+      <p>Selecciona un fondo o introduce los parámetros manualmente<br>y pulsa <strong>Calcular proyección</strong></p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const FONDOS = [
+  { nombre: 'S&P 500',        rentab: 10.5, tipo: 'ETF · USA Large Cap',        emoji: '🇺🇸' },
+  { nombre: 'MSCI World',     rentab: 9.8,  tipo: 'ETF · Global Diversificado', emoji: '🌍' },
+  { nombre: 'NASDAQ 100',     rentab: 13.2, tipo: 'ETF · Tech USA',             emoji: '💻' },
+  { nombre: 'MSCI Emerging',  rentab: 7.5,  tipo: 'ETF · Mercados Emergentes',  emoji: '🌏' },
+  { nombre: 'Ibex 35',        rentab: 5.8,  tipo: 'ETF · España',               emoji: '🇪🇸' },
+  { nombre: 'Eurostoxx 50',   rentab: 7.2,  tipo: 'ETF · Europa',               emoji: '🇪🇺' },
+  { nombre: 'MSCI World ESG', rentab: 9.1,  tipo: 'ETF · Sostenible Global',    emoji: '♻️' },
+  { nombre: 'Personalizado',  rentab: null, tipo: 'Introduce tu % manualmente', emoji: '✏️' },
+];
+
+function renderFondos() {
+  const grid = document.getElementById('fondosGrid');
+  grid.innerHTML = '';
+  FONDOS.forEach((f, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'fondo-btn';
+    btn.id = 'fondo-' + i;
+    btn.innerHTML = `
+      <div class="fondo-nombre">${f.emoji} ${f.nombre}</div>
+      <div class="fondo-rentab">${f.rentab !== null ? f.rentab + '%' : '—'}</div>
+      <div class="fondo-tipo">${f.tipo}</div>
+    `;
+    btn.onclick = () => seleccionarFondo(i, f);
+    grid.appendChild(btn);
+  });
+}
+
+function seleccionarFondo(idx, f) {
+  document.querySelectorAll('.fondo-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('fondo-' + idx).classList.add('selected');
+  if (f.rentab !== null) {
+    document.getElementById('rentabilidadInput').value = f.rentab;
+    document.getElementById('rentabilidadSlider').value = Math.min(f.rentab, 20);
+    document.getElementById('rentabilidadVal').textContent = f.rentab + '%';
+  }
+}
+
+function fmt(n) {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+function fmtK(n) {
+  if (n >= 1000000) return (n/1000000).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' M€';
+  if (n >= 1000)    return (n/1000).toLocaleString('es-ES',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' K€';
+  return fmt(n);
+}
+
+function getParams() {
+  return {
+    capitalInicial: parseFloat(document.getElementById('capitalInicial').value) || 0,
+    aportMensual: parseFloat(document.getElementById('aportacionMensual').value) || 0,
+    rentabilidad: parseFloat(document.getElementById('rentabilidadInput').value) || 0,
+    anios: parseInt(document.getElementById('aniosInput').value) || 20,
+    inflacion: parseFloat(document.getElementById('inflacionInput').value) || 0,
+  };
+}
+
+function setParams(p) {
+  if (!p) return;
+  if (p.capitalInicial !== undefined) document.getElementById('capitalInicial').value = p.capitalInicial;
+  if (p.aportMensual !== undefined) document.getElementById('aportacionMensual').value = p.aportMensual;
+  if (p.rentabilidad !== undefined) {
+    document.getElementById('rentabilidadInput').value = p.rentabilidad;
+    document.getElementById('rentabilidadSlider').value = Math.min(p.rentabilidad, 20);
+    document.getElementById('rentabilidadVal').textContent = p.rentabilidad + '%';
+  }
+  if (p.anios !== undefined) {
+    document.getElementById('aniosInput').value = p.anios;
+    document.getElementById('aniosSlider').value = p.anios;
+    document.getElementById('aniosVal').textContent = p.anios + ' años';
+  }
+  if (p.inflacion !== undefined) {
+    document.getElementById('inflacionInput').value = p.inflacion;
+    document.getElementById('inflacionSlider').value = p.inflacion;
+    document.getElementById('inflacionVal').textContent = p.inflacion + '%';
+  }
+  calcular();
+}
+
+function saveDataLocal(p) {
+  try { localStorage.setItem('simulador_data', JSON.stringify(p)); } catch(e){}
+}
+
+function getDataLocal() {
+  try {
+    const raw = localStorage.getItem('simulador_data');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function ejecutarCalcular() {
+  const p = getParams();
+  saveDataLocal(p);
+  if (typeof window.saveDataCloud === 'function') {
+    window.saveDataCloud(p);
+  }
+  calcular();
+}
+
+function calcular() {
+  const { capitalInicial, aportMensual, rentabilidad, anios, inflacion } = getParams();
+
+  const rMensual = rentabilidad / 100 / 12;
+  const filas = [];
+  let saldo = capitalInicial;
+  let saldoReal = capitalInicial;
+
+  for (let a = 1; a <= anios; a++) {
+    for (let m = 0; m < 12; m++) {
+      saldo = saldo * (1 + rMensual) + aportMensual;
+    }
+    const totalAportado = capitalInicial + aportMensual * 12 * a;
+    const ganancia = saldo - totalAportado;
+    const rReal = ((1 + rentabilidad/100) / (1 + inflacion/100)) - 1;
+    saldoReal = capitalInicial * Math.pow(1 + rReal, a)
+                + aportMensual * 12 * ((Math.pow(1 + rReal, a) - 1) / rReal);
+
+    filas.push({
+      anio: a,
+      capitalInvertido: totalAportado,
+      saldoTotal: saldo,
+      ganancia: ganancia,
+      saldoReal: saldoReal,
+      pctGanancia: totalAportado > 0 ? (ganancia / totalAportado) * 100 : 0,
+    });
+  }
+
+  const ultimo = filas[filas.length - 1];
+  const totalAportado = capitalInicial + aportMensual * 12 * anios;
+  const totalGanancia = ultimo.saldoTotal - totalAportado;
+  const multiplicador = totalAportado > 0 ? (ultimo.saldoTotal / totalAportado) : 1;
+
+  const sinInvertir = totalAportado;
+  const cuentaAhorro = (() => {
+    let s = capitalInicial;
+    for (let m = 0; m < anios * 12; m++) s = s * (1 + 0.02/12) + aportMensual;
+    return s;
+  })();
+
+  const hitos = [5, 10, 20, 30].filter(h => h <= anios).map(h => {
+    const f = filas[h - 1];
+    return f ? { anio: h, total: f.saldoTotal, real: f.saldoReal } : null;
+  }).filter(Boolean);
+
+  renderResultados({
+    filas, ultimo, totalAportado, totalGanancia, multiplicador,
+    sinInvertir, cuentaAhorro, hitos,
+    capitalInicial, aportMensual, rentabilidad, anios, inflacion
+  });
+}
+
+function renderResultados(d) {
+  const { filas, ultimo, totalAportado, totalGanancia, multiplicador,
+          sinInvertir, cuentaAhorro, hitos,
+          capitalInicial, aportMensual, rentabilidad, anios, inflacion } = d;
+
+  const div = document.getElementById('resultados');
+  div.innerHTML = `
+    <div class="kpi-grid">
+      <div class="kpi highlight">
+        <div class="kpi-label">💰 Capital final</div>
+        <div class="kpi-val" id="kpiCapitalFinal">${fmtK(ultimo.saldoTotal)}</div>
+        <div class="kpi-sub">En ${anios} años al ${rentabilidad}%/año</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">📈 Ganancias generadas</div>
+        <div class="kpi-val" style="color:var(--green)">${fmtK(totalGanancia)}</div>
+        <div class="kpi-sub">${totalGanancia > 0 ? '+' : ''}${d.filas[anios-1].pctGanancia.toFixed(1)}% sobre lo aportado</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">💵 Total aportado</div>
+        <div class="kpi-val">${fmtK(totalAportado)}</div>
+        <div class="kpi-sub">${fmt(capitalInicial)} inicial + ${fmt(aportMensual)}/mes</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">✕ Tu dinero se multiplica</div>
+        <div class="kpi-val" style="color:var(--primary)">×${multiplicador.toFixed(2)}</div>
+        <div class="kpi-sub">Valor real (inflación): ${fmtK(ultimo.saldoReal)}</div>
+      </div>
+    </div>
+
+    ${hitos.length > 1 ? `
+    <div class="card">
+      <div class="card-title">🏁 Hitos de crecimiento</div>
+      <div style="display:grid;grid-template-columns:repeat(${hitos.length},1fr);gap:12px">
+        ${hitos.map(h => `
+          <div style="text-align:center;padding:14px;background:var(--primary-lt);border-radius:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:4px">AÑO ${h.anio}</div>
+            <div style="font-size:20px;font-weight:900;color:var(--primary)">${fmtK(h.total)}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Real: ${fmtK(h.real)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="card">
+      <div class="card-title">📊 Evolución del capital</div>
+      <div class="chart-container">
+        <canvas id="chartCanvas"></canvas>
+      </div>
+      <div style="display:flex;gap:20px;justify-content:center;font-size:12px;margin-top:8px">
+        <span><span style="display:inline-block;width:12px;height:12px;background:#6C63FF;border-radius:3px;margin-right:5px"></span>Capital total</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#10B981;border-radius:3px;margin-right:5px"></span>Lo aportado</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚖️ Comparativa — mismas aportaciones</div>
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="comp-name">🛏️ Sin invertir (colchón)</div>
+          <div class="comp-val" style="color:var(--text-muted)">${fmtK(sinInvertir)}</div>
+          <div class="comp-pct" style="color:var(--text-muted)">0% rentabilidad</div>
+        </div>
+        <div class="comp-card">
+          <div class="comp-name">🏦 Cuenta ahorro (2%)</div>
+          <div class="comp-val" style="color:var(--yellow)">${fmtK(cuentaAhorro)}</div>
+          <div class="comp-pct" style="color:var(--yellow)">+${fmtK(cuentaAhorro - sinInvertir)} vs colchón</div>
+        </div>
+        <div class="comp-card winner">
+          <div class="comp-name">📈 Tu fondo (${rentabilidad}%)</div>
+          <div class="comp-val" style="color:var(--primary)">${fmtK(ultimo.saldoTotal)}</div>
+          <div class="comp-pct">+${fmtK(ultimo.saldoTotal - sinInvertir)} vs colchón</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Progresión año a año</div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Año</th>
+              <th>Capital aportado</th>
+              <th>Intereses generados</th>
+              <th>Capital total</th>
+              <th>Valor real*</th>
+              <th>Progreso</th>
+            </tr>
+          </thead>
+          <tbody id="tablaBody"></tbody>
+        </table>
+      </div>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:12px">
+        * Valor real ajustado a inflación del ${inflacion}% anual
+      </p>
+    </div>
+  `;
+
+  const tbody = document.getElementById('tablaBody');
+  const maxTotal = filas[filas.length - 1].saldoTotal;
+  filas.forEach(f => {
+    const pctBar = (f.saldoTotal / maxTotal) * 100;
+    const pctAport = (f.capitalInvertido / maxTotal) * 100;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-year">Año ${f.anio}</td>
+      <td class="td-capital">${fmtK(f.capitalInvertido)}</td>
+      <td class="td-ganancia ${f.ganancia < 0 ? 'neg' : ''}">${f.ganancia >= 0 ? '+' : ''}${fmtK(f.ganancia)}</td>
+      <td class="td-total">${fmtK(f.saldoTotal)}</td>
+      <td style="color:var(--text-muted);font-size:13px">${fmtK(f.saldoReal)}</td>
+      <td class="td-bar">
+        <div class="mini-bar" style="position:relative;height:14px;border-radius:7px">
+          <div style="position:absolute;top:0;left:0;height:100%;width:${pctBar}%;
+                      background:linear-gradient(90deg,var(--primary),#8B80F8);border-radius:7px"></div>
+          <div style="position:absolute;top:0;left:0;height:100%;width:${pctAport}%;
+                      background:rgba(16,185,129,.4);border-radius:7px"></div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  setTimeout(() => dibujarGrafica(filas), 50);
+}
+
+function dibujarGrafica(filas) {
+  const canvas = document.getElementById('chartCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth;
+  const H = 280;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+
+  const pad = { top: 20, right: 20, bottom: 40, left: 70 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top  - pad.bottom;
+
+  const maxVal = filas[filas.length - 1].saldoTotal;
+  const nAnios = filas.length;
+
+  function xPos(i) { return pad.left + (i / (nAnios - 1)) * cW; }
+  function yPos(v) { return pad.top + cH - (v / maxVal) * cH; }
+
+  ctx.beginPath();
+  ctx.moveTo(xPos(0), yPos(filas[0].saldoTotal));
+  filas.forEach((f, i) => ctx.lineTo(xPos(i), yPos(f.saldoTotal)));
+  filas.slice().reverse().forEach((f, i) => ctx.lineTo(xPos(nAnios - 1 - i), yPos(f.capitalInvertido)));
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + cH);
+  grad.addColorStop(0, 'rgba(108,99,255,.25)');
+  grad.addColorStop(1, 'rgba(108,99,255,.05)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(xPos(0), yPos(filas[0].capitalInvertido));
+  filas.forEach((f, i) => ctx.lineTo(xPos(i), yPos(f.capitalInvertido)));
+  ctx.lineTo(xPos(nAnios - 1), yPos(0));
+  ctx.lineTo(xPos(0), yPos(0));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(16,185,129,.15)';
+  ctx.fill();
+
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (cH / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + cW, y);
+    ctx.stroke();
+    const val = maxVal * (1 - i / 4);
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '11px Segoe UI';
+    ctx.textAlign = 'right';
+    ctx.fillText(fmtK(val), pad.left - 8, y + 4);
+  }
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#10B981';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 4]);
+  filas.forEach((f, i) => {
+    i === 0 ? ctx.moveTo(xPos(i), yPos(f.capitalInvertido))
+             : ctx.lineTo(xPos(i), yPos(f.capitalInvertido));
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#6C63FF';
+  ctx.lineWidth = 3;
+  filas.forEach((f, i) => {
+    i === 0 ? ctx.moveTo(xPos(i), yPos(f.saldoTotal))
+             : ctx.lineTo(xPos(i), yPos(f.saldoTotal));
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '11px Segoe UI';
+  ctx.textAlign = 'center';
+  const step = Math.ceil(nAnios / 8);
+  filas.forEach((f, i) => {
+    if (i % step === 0 || i === nAnios - 1) {
+      ctx.fillText('Año ' + f.anio, xPos(i), H - 10);
+    }
+  });
+
+  const lastF = filas[nAnios - 1];
+  ctx.beginPath();
+  ctx.arc(xPos(nAnios - 1), yPos(lastF.saldoTotal), 6, 0, Math.PI * 2);
+  ctx.fillStyle = '#6C63FF';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+renderFondos();
+
+['capitalInicial','aportacionMensual','rentabilidadInput','aniosInput','inflacionInput']
+  .forEach(id => {
+    document.getElementById(id).addEventListener('change', ejecutarCalcular);
+  });
+
+const localP = getDataLocal();
+if (localP) setParams(localP);
+else calcular();
+</script>
+
+<!-- FIREBASE SDK (COMPAT) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
+  authDomain: "mis-finanzas-85c47.firebaseapp.com",
+  projectId: "mis-finanzas-85c47",
+  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
+  messagingSenderId: "584441374984",
+  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db      = firebase.firestore();
+const DOC_REF = db.collection('usuarios').doc('miquel_simulador');
+let _syncBlocked = false;
+
+function setSyncStatus(estado) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (estado === 'ok')      { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
+  if (estado === 'saving')  { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
+  if (estado === 'error')   { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
+  if (estado === 'loading') { el.textContent = '🔄 Cargando...';  el.style.color = '#aaa'; }
+}
+
+function saveDataCloud(d) {
+  saveDataLocal(d);
+  setSyncStatus('saving');
+  _syncBlocked = true;
+  DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
+    .then(() => {
+      setSyncStatus('ok');
+      setTimeout(() => { _syncBlocked = false; }, 1200);
+    })
+    .catch((err) => {
+      console.error("Firebase Sync Error:", err);
+      setSyncStatus('error');
+      _syncBlocked = false;
+    });
+}
+
+window.saveDataCloud = saveDataCloud;
+
+setSyncStatus('loading');
+DOC_REF.onSnapshot(snap => {
+  if (_syncBlocked) return;
+  if (snap.exists) {
+    try {
+      const remoteData = JSON.parse(snap.data().data);
+      saveDataLocal(remoteData);
+      setParams(remoteData);
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  } else {
+    setSyncStatus('ok');
+  }
+}, (err) => {
+  console.error("Snapshot error:", err);
+  setSyncStatus('error');
+});
+</script>
+</body>
+</html>
