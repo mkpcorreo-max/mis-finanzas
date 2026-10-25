@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Portfolio de Inversión — Panel Avanzado</title>
+<title>Portfolio de Inversión — Gestión Avanzada</title>
 <style>
 :root {
   --primary: #6C63FF;
@@ -166,8 +166,8 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .modal-overlay.open { display:flex; }
 .modal {
   background:#fff; border-radius:20px; padding:28px;
-  width:100%; max-width:540px; box-shadow:0 20px 60px rgba(0,0,0,.3);
-  position: relative; animation: modalPop 0.25s ease-out;
+  width:100%; max-width:640px; box-shadow:0 20px 60px rgba(0,0,0,.3);
+  position: relative; animation: modalPop 0.25s ease-out; max-height: 90vh; overflow-y: auto;
 }
 @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
@@ -327,6 +327,7 @@ input:checked + .toggle-slider:before { transform:translateX(20px); }
       <div class="card-title" style="margin-bottom:0">📋 Posiciones actuales</div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-secondary btn-sm" onclick="exportarBackupJSON()">📥 Backup</button>
+        <button class="btn btn-secondary btn-sm" onclick="abrirModalGestionActivos()">⚙️ Configurar Cartera</button>
         <button class="btn btn-primary btn-sm" onclick="abrirModalActualizar()">✏️ Actualizar valores</button>
       </div>
     </div>
@@ -356,7 +357,7 @@ input:checked + .toggle-slider:before { transform:translateX(20px); }
       <div class="dca-registro" id="dcaRegistro"></div>
     </div>
 
-    <!-- CONFIGURADOR INTERACTIVO DE ESTRATEGIA (CON TOGGLES) -->
+    <!-- ESTRATEGIA Y REGLAS -->
     <div>
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -376,7 +377,7 @@ input:checked + .toggle-slider:before { transform:translateX(20px); }
             </ul>
           </div>
           <div class="alerta-consistencia" id="alertaEstrateia">
-            <span>✅ Registro de aportaciones y cuotas DCA actualizadas dinámicamente con la estrategia.</span>
+            <span>✅ Sincronización automática de estrategia y activos activos.</span>
           </div>
         </div>
       </div>
@@ -402,6 +403,27 @@ input:checked + .toggle-slider:before { transform:translateX(20px); }
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GESTIÓN / CONFIGURACIÓN DE ACTIVOS (AÑADIR, EDITAR, ELIMINAR) -->
+<div class="modal-overlay" id="modalGestionActivos">
+  <div class="modal" style="max-width: 800px;">
+    <button class="modal-close" onclick="cerrarModal('modalGestionActivos')">✕</button>
+    <h3>⚙️ Configuración y Gestión de Activos</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Modifica nombres, tickers, pesos objetivo (%) o añade/elimina fondos de tu cartera fácilmente.</p>
+    
+    <div id="listaActivosConfig" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#F8F9FF;border-radius:10px;margin-bottom:20px">
+      <button class="btn btn-secondary btn-sm" onclick="agregarNuevoActivoForm()">➕ Añadir nuevo activo</button>
+      <div id="sumaPesosTotal" style="font-weight:900;font-size:13px">Suma pesos: 100%</div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalGestionActivos')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarConfiguracionActivos()">💾 Guardar cambios de cartera</button>
     </div>
   </div>
 </div>
@@ -497,7 +519,7 @@ input:checked + .toggle-slider:before { transform:translateX(20px); }
 </div>
 
 <script>
-let ACTIVOS = [
+const DEFAULT_ACTIVOS = [
   {
     id: 'sp500',
     nombre: 'Fidelity S&P 500 Index Fund P Acc',
@@ -507,10 +529,10 @@ let ACTIVOS = [
     catLabel: 'Renta Variable',
     plataforma: 'myinvestor',
     platLabel: 'MyInvestor',
-    dcaMensual: 500,
     pctObjetivo: 25,
     color: '#6C63FF',
     posicionInicial: 2500,
+    esLiquidez: false,
   },
   {
     id: 'europa',
@@ -521,10 +543,10 @@ let ACTIVOS = [
     catLabel: 'Renta Variable',
     plataforma: 'myinvestor',
     platLabel: 'MyInvestor',
-    dcaMensual: 250,
     pctObjetivo: 12.5,
     color: '#3B82F6',
     posicionInicial: 0,
+    esLiquidez: false,
   },
   {
     id: 'india',
@@ -535,10 +557,10 @@ let ACTIVOS = [
     catLabel: 'Renta Variable',
     plataforma: 'myinvestor',
     platLabel: 'MyInvestor',
-    dcaMensual: 150,
     pctObjetivo: 7.5,
     color: '#F97316',
     posicionInicial: 0,
+    esLiquidez: false,
   },
   {
     id: 'china',
@@ -549,10 +571,10 @@ let ACTIVOS = [
     catLabel: 'Renta Variable',
     plataforma: 'myinvestor',
     platLabel: 'MyInvestor',
-    dcaMensual: 100,
     pctObjetivo: 5,
     color: '#EF4444',
     posicionInicial: 0,
+    esLiquidez: false,
   },
   {
     id: 'oro',
@@ -563,10 +585,10 @@ let ACTIVOS = [
     catLabel: 'Oro / Refugio',
     plataforma: 'myinvestor',
     platLabel: 'MyInvestor',
-    dcaMensual: 350,
     pctObjetivo: 20,
     color: '#F59E0B',
     posicionInicial: 0,
+    esLiquidez: false,
   },
   {
     id: 'liquidez_mi',
@@ -577,7 +599,6 @@ let ACTIVOS = [
     catLabel: 'Liquidez Táctica',
     plataforma: 'myinvestor',
     platLabel: 'MyInvestor',
-    dcaMensual: 0,
     pctObjetivo: 0,
     color: '#10B981',
     posicionInicial: 3500,
@@ -592,7 +613,6 @@ let ACTIVOS = [
     catLabel: 'Liquidez Táctica',
     plataforma: 'trade',
     platLabel: 'Trade Republic',
-    dcaMensual: 0,
     pctObjetivo: 0,
     color: '#34D399',
     posicionInicial: 2600,
@@ -603,8 +623,7 @@ let ACTIVOS = [
 const DCA_MESES = [
   'Nov 2026','Dic 2026','Ene 2027','Feb 2027','Mar 2027',
   'Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027',
-  'Sep 2027','Oct 2027','Nov 2027','Dic 2027','Ene 2028',
-  'Feb 2028','Mar 2028','Abr 2028'
+  'Sep 2027','Oct 2027','Nov 2027','Dic 2027','Ene 2028'
 ];
 
 function getData() {
@@ -621,6 +640,15 @@ function saveData(d) {
   if (typeof window.saveDataCloud === 'function') {
     window.saveDataCloud(d);
   }
+}
+
+function getActivos() {
+  const d = getData();
+  if (!d.activosList || !Array.isArray(d.activosList)) {
+    d.activosList = DEFAULT_ACTIVOS;
+    saveDataLocal(d);
+  }
+  return d.activosList;
 }
 
 function getEstrategia() {
@@ -641,17 +669,18 @@ function getEstrategia() {
 
 function getPortfolio() {
   const d = getData();
-  if (!d.portfolio) {
-    d.portfolio = {};
-    ACTIVOS.forEach(a => {
+  const activos = getActivos();
+  if (!d.portfolio) d.portfolio = {};
+  
+  activos.forEach(a => {
+    if (!d.portfolio[a.id]) {
       d.portfolio[a.id] = {
-        valorActual: a.posicionInicial,
-        totalAportado: a.posicionInicial,
+        valorActual: a.posicionInicial || 0,
+        totalAportado: a.posicionInicial || 0,
         lastUpdate: null,
       };
-    });
-    saveDataLocal(d);
-  }
+    }
+  });
   return d.portfolio;
 }
 
@@ -730,25 +759,9 @@ function renderRegistroDCA(aports, ejecutados) {
 }
 
 function borrarAportacion(mes) {
-  if (!confirm(`¿Estás seguro de que deseas eliminar el registro de la aportación de ${mes}?`)) return;
-
+  if (!confirm(`¿Estás seguro de eliminar el registro de ${mes}?`)) return;
   const d = getData();
-  const est = getEstrategia();
-  const mensImporte = est.capitalTotal / est.plazoMeses;
-  
   if (d.aportaciones) {
-    const aportEliminada = d.aportaciones.find(a => a.mes === mes);
-    if (aportEliminada && d.portfolio) {
-      const factor = (aportEliminada.importe || 0) / mensImporte;
-      ACTIVOS.forEach(a => {
-        if (d.portfolio[a.id]) {
-          const decrem = (a.dcaMensual || 0) * factor;
-          d.portfolio[a.id].totalAportado = Math.max(0, (d.portfolio[a.id].totalAportado || 0) - decrem);
-          d.portfolio[a.id].valorActual = Math.max(0, (d.portfolio[a.id].valorActual || 0) - decrem);
-        }
-      });
-    }
-
     d.aportaciones = d.aportaciones.filter(a => a.mes !== mes);
     saveData(d);
     renderAll();
@@ -759,7 +772,7 @@ function renderKPIs() {
   const p = getPortfolio();
   let totalValor = 0, totalAportado = 0, totalLiquidez = 0;
 
-  ACTIVOS.forEach(a => {
+  getActivos().forEach(a => {
     const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
     totalValor    += pos.valorActual;
     totalAportado += pos.totalAportado;
@@ -782,16 +795,16 @@ function renderTabla() {
   const p = getPortfolio();
   const est = getEstrategia();
   const mensImporteGlobal = est.capitalTotal / est.plazoMeses;
+  const activos = getActivos();
 
   const tbody = document.getElementById('activosTbody');
   tbody.innerHTML = '';
 
-  let totAportado = 0, totValor = 0, totDcaMensual = 0;
+  let totAportado = 0, totValor = 0;
 
-  ACTIVOS.forEach(a => {
-    // Recalcular dinámicamente la cuota mensual de cada activo según la estrategia global
-    a.dcaMensual = (a.pctObjetivo / 100) * mensImporteGlobal;
-    totDcaMensual += a.dcaMensual;
+  activos.forEach(a => {
+    // Si no es liquidez, calcular cuota mensual DCA según su peso %
+    const dcaMensual = a.esLiquidez ? 0 : (a.pctObjetivo / 100) * mensImporteGlobal;
 
     const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
     const ganancia = pos.valorActual - pos.totalAportado;
@@ -808,17 +821,18 @@ function renderTabla() {
                     : a.plataforma === 'trade' ? 'plat-trade' : 'plat-bankinter';
     const catClass  = a.categoria === 'rv' ? 'cat-rv' : a.categoria === 'oro' ? 'cat-oro'
                     : a.categoria === 'liquid' ? 'cat-liquid' : 'cat-emerg';
-    const dcaStr    = a.dcaMensual > 0 ? `<strong style="color:var(--primary)">${fmt(a.dcaMensual)}</strong>` : '<span style="color:var(--text-muted)">—</span>';
-    const pctStr    = a.pctObjetivo > 0 ? `<span style="font-size:11px;color:var(--text-muted)">${a.pctObjetivo}%</span>` : '<span style="color:var(--text-muted)">—</span>';
+    
+    const dcaStr    = !a.esLiquidez && dcaMensual > 0 ? `<strong style="color:var(--primary)">${fmt(dcaMensual)}</strong>` : '<span style="color:var(--text-muted)">—</span>';
+    const pctStr    = !a.esLiquidez && a.pctObjetivo > 0 ? `<span style="font-size:11px;color:var(--text-muted)">${a.pctObjetivo}%</span>` : '<span style="color:var(--text-muted)">—</span>';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
-        <div class="activo-nombre">${a.emoji} ${a.nombre.length > 32 ? a.nombre.substring(0,32)+'…' : a.nombre}</div>
-        <div class="activo-ticker">${a.ticker}</div>
+        <div class="activo-nombre">${a.emoji || '💼'} ${a.nombre.length > 32 ? a.nombre.substring(0,32)+'…' : a.nombre}</div>
+        <div class="activo-ticker">${a.ticker || ''}</div>
       </td>
-      <td><span class="badge-categoria ${catClass}">${a.catLabel}</span></td>
-      <td><span class="activo-plat ${platClass}">${a.platLabel}</span></td>
+      <td><span class="badge-categoria ${catClass}">${a.catLabel || 'Activo'}</span></td>
+      <td><span class="activo-plat ${platClass}">${a.platLabel || a.plataforma}</span></td>
       <td>${pctStr}</td>
       <td style="font-weight:600">${pos.totalAportado > 0 ? fmtK(pos.totalAportado) : '—'}</td>
       <td><span class="valor-actual">${pos.valorActual > 0 ? fmtK(pos.valorActual) : '—'}</span></td>
@@ -850,11 +864,11 @@ function renderDonut() {
 
   ctx.clearRect(0, 0, W, H);
 
-  const segmentos = ACTIVOS.filter(a => a.pctObjetivo > 0).map(a => ({
-    pct: a.pctObjetivo, color: a.color, label: a.emoji + ' ' + a.nombre.split(' ')[0],
-    importe: a.dcaMensual,
+  const activos = getActivos();
+  const segmentos = activos.filter(a => !a.esLiquidez && a.pctObjetivo > 0).map(a => ({
+    pct: a.pctObjetivo, color: a.color || '#6C63FF', label: (a.emoji || '💼') + ' ' + a.nombre.split(' ')[0],
   }));
-  segmentos.push({ pct: 30, color: '#10B981', label: '💧 Liquidez', importe: 650 });
+  segmentos.push({ pct: 30, color: '#10B981', label: '💧 Liquidez' });
 
   let startAngle = -Math.PI / 2;
   segmentos.forEach(s => {
@@ -895,7 +909,7 @@ function renderPlataformas() {
     bankinter:  { nombre: 'Bankinter', emoji: '🟠', color: '#F97316', total: 15000, tipos: 'Fondo de emergencia 3,0% TAE' },
   };
 
-  ACTIVOS.forEach(a => {
+  getActivos().forEach(a => {
     const pos = p[a.id] || { valorActual: 0 };
     if (plats[a.plataforma]) plats[a.plataforma].total += pos.valorActual;
   });
@@ -944,9 +958,9 @@ function renderEstrategia() {
   reglasLista.innerHTML = '';
 
   const reglas = [
-    { act: est.permitirExtra, desc: '⚡ Permitir aportación extra si el mercado cae más del 10% (DCA dinámico)' },
-    { act: est.autoRebalancear, desc: '📈 Auto-rebalancear al finalizar el periodo de 10 meses' },
-    { act: est.bloqueoLiquidez, desc: '💧 Mantener siempre un 30% en Liquidez Táctica de seguridad' }
+    { act: est.permitirExtra, desc: '⚡ Permitir aportación extra si el mercado cae más del 10%' },
+    { act: est.autoRebalancear, desc: '📈 Auto-rebalancear al finalizar el periodo DCA' },
+    { act: est.bloqueoLiquidez, desc: '💧 Mantener siempre un 30% en Liquidez Táctica' }
   ];
 
   reglas.forEach(r => {
@@ -958,8 +972,110 @@ function renderEstrategia() {
   });
 
   if (reglasLista.children.length === 0) {
-    reglasLista.innerHTML = '<span style="color:rgba(0,0,0,0.5)">Ninguna regla táctica activa.</span>';
+    reglasLista.innerHTML = '<span style="color:rgba(0,0,0,0.5)">Ninguna regla activa.</span>';
   }
+}
+
+// MODAL CONFIGURACIÓN / GESTIÓN DE ACTIVOS
+function abrirModalGestionActivos() {
+  const activos = getActivos();
+  const container = document.getElementById('listaActivosConfig');
+  container.innerHTML = '';
+
+  activos.forEach((a, idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:grid;grid-template-columns:30px 1fr 1fr 110px 110px 80px 40px;gap:8px;align-items:center;background:#FAFAFA;padding:10px;border-radius:10px;border:1px solid var(--border)';
+    div.innerHTML = `
+      <input type="text" value="${a.emoji || '💼'}" id="cfg_emoji_${idx}" style="text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <input type="text" value="${a.nombre}" id="cfg_nombre_${idx}" placeholder="Nombre del fondo/activo" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <input type="text" value="${a.ticker || ''}" id="cfg_ticker_${idx}" placeholder="Ticker / ISIN" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <select id="cfg_plat_${idx}" style="padding:6px;border:1px solid var(--border);border-radius:6px">
+        <option value="myinvestor" ${a.plataforma==='myinvestor'?'selected':''}>MyInvestor</option>
+        <option value="trade" ${a.plataforma==='trade'?'selected':''}>Trade Rep.</option>
+        <option value="bankinter" ${a.plataforma==='bankinter'?'selected':''}>Bankinter</option>
+      </select>
+      <input type="number" value="${a.esLiquidez ? 0 : a.pctObjetivo}" id="cfg_pct_${idx}" placeholder="Peso %" min="0" max="100" step="0.5" ${a.esLiquidez?'disabled':''} style="padding:6px;border:1px solid var(--border);border-radius:6px" oninput="calcularSumaPesosConfig()" />
+      <span style="font-size:11px;color:var(--text-muted)">${a.esLiquidez ? 'Liquidez' : 'Activo DCA'}</span>
+      <button class="btn btn-danger btn-sm" onclick="eliminarActivoConfig(${idx})" title="Eliminar activo">🗑️</button>
+    `;
+    container.appendChild(div);
+  });
+
+  calcularSumaPesosConfig();
+  document.getElementById('modalGestionActivos').classList.add('open');
+}
+
+function calcularSumaPesosConfig() {
+  const activos = getActivos();
+  let suma = 0;
+  activos.forEach((a, idx) => {
+    if (!a.esLiquidez) {
+      const input = document.getElementById(`cfg_pct_${idx}`);
+      if (input) suma += parseFloat(input.value) || 0;
+    }
+  });
+  const el = document.getElementById('sumaPesosTotal');
+  el.textContent = `Suma pesos: ${suma}%`;
+  el.style.color = suma === 100 ? 'var(--green)' : 'var(--red)';
+}
+
+function agregarNuevoActivoForm() {
+  const activos = getActivos();
+  activos.push({
+    id: 'activo_' + Date.now(),
+    nombre: 'Nuevo Fondo / Activo',
+    ticker: 'ISIN000000',
+    emoji: '📈',
+    categoria: 'rv',
+    catLabel: 'Renta Variable',
+    plataforma: 'myinvestor',
+    platLabel: 'MyInvestor',
+    pctObjetivo: 0,
+    color: '#6C63FF',
+    posicionInicial: 0,
+    esLiquidez: false,
+  });
+  saveDataLocal({ ...getData(), activosList: activos });
+  abrirModalGestionActivos();
+}
+
+function eliminarActivoConfig(idx) {
+  const activos = getActivos();
+  if (activos.length <= 1) { alert('Debe haber al menos un activo en la cartera.'); return; }
+  if (!confirm(`¿Eliminar "${activos[idx].nombre}" de la cartera?`)) return;
+  
+  activos.splice(idx, 1);
+  saveDataLocal({ ...getData(), activosList: activos });
+  abrirModalGestionActivos();
+}
+
+function guardarConfiguracionActivos() {
+  const activos = getActivos();
+  let suma = 0;
+
+  activos.forEach((a, idx) => {
+    a.emoji = document.getElementById(`cfg_emoji_${idx}`).value.trim() || '💼';
+    a.nombre = document.getElementById(`cfg_nombre_${idx}`).value.trim() || 'Sin nombre';
+    a.ticker = document.getElementById(`cfg_ticker_${idx}`).value.trim();
+    a.plataforma = document.getElementById(`cfg_plat_${idx}`).value;
+    a.platLabel = a.plataforma === 'myinvestor' ? 'MyInvestor' : a.plataforma === 'trade' ? 'Trade Republic' : 'Bankinter';
+    
+    if (!a.esLiquidez) {
+      a.pctObjetivo = parseFloat(document.getElementById(`cfg_pct_${idx}`).value) || 0;
+      suma += a.pctObjetivo;
+    }
+  });
+
+  if (Math.abs(suma - 100) > 0.01) {
+    alert(`La suma de los pesos de los activos DCA debe ser exactamente 100% (actualmente suma ${suma}%).`);
+    return;
+  }
+
+  const d = getData();
+  d.activosList = activos;
+  saveData(d);
+  cerrarModal('modalGestionActivos');
+  renderAll();
 }
 
 function abrirModalEstrategia() {
@@ -985,14 +1101,7 @@ function guardarEstrategia() {
   if (cap <= 0) { alert('Introduce un capital objetivo válido'); return; }
 
   const d = getData();
-  d.estrategia = {
-    capitalTotal: cap,
-    plazoMeses: plz,
-    inicioMes: ini,
-    permitirExtra: ex,
-    autoRebalancear: reb,
-    bloqueoLiquidez: liq
-  };
+  d.estrategia = { capitalTotal: cap, plazoMeses: plz, inicioMes: ini, permitirExtra: ex, autoRebalancear: reb, bloqueoLiquidez: liq };
 
   saveData(d);
   cerrarModal('modalEstrategia');
@@ -1003,19 +1112,15 @@ function abrirModalActualizar() {
   const p = getPortfolio();
   const form = document.getElementById('modalActivosForms');
   form.innerHTML = '';
-  ACTIVOS.forEach(a => {
+  getActivos().forEach(a => {
     const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
     const div = document.createElement('div');
     div.className = 'modal-field';
     div.innerHTML = `
-      <label>${a.emoji} ${a.nombre.substring(0,40)}</label>
+      <label>${a.emoji || '💼'} ${a.nombre.substring(0,40)}</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <input type="number" id="val_${a.id}" placeholder="Valor actual €" value="${pos.valorActual || ''}" min="0" step="0.01" inputmode="decimal" />
         <input type="number" id="aport_${a.id}" placeholder="Total aportado €" value="${pos.totalAportado || ''}" min="0" step="0.01" inputmode="decimal" />
-      </div>
-      <div style="display:flex;gap:6px;font-size:10px;color:var(--text-muted);margin-top:3px">
-        <span style="flex:1;text-align:center">Valor actual</span>
-        <span style="flex:1;text-align:center">Total aportado</span>
       </div>
     `;
     form.appendChild(div);
@@ -1026,7 +1131,7 @@ function abrirModalActualizar() {
 function guardarValores() {
   const d = getData();
   if (!d.portfolio) d.portfolio = {};
-  ACTIVOS.forEach(a => {
+  getActivos().forEach(a => {
     const val = parseFloat(document.getElementById('val_' + a.id).value) || 0;
     const aport = parseFloat(document.getElementById('aport_' + a.id).value) || 0;
     d.portfolio[a.id] = { valorActual: val, totalAportado: aport, lastUpdate: new Date().toISOString() };
@@ -1061,29 +1166,12 @@ function guardarAportacion() {
   if (importe <= 0) { alert('Introduce un importe válido'); return; }
 
   const d = getData();
-  const est = getEstrategia();
-  const mensImporte = est.capitalTotal / est.plazoMeses;
-  
   if (!d.aportaciones) d.aportaciones = [];
   const idx = d.aportaciones.findIndex(a => a.mes === mes);
-  const esPrimera = idx < 0;
   const entry = { mes, importe, nota, ejecutado: true, fecha: new Date().toISOString() };
 
   if (idx >= 0) d.aportaciones[idx] = entry;
   else d.aportaciones.push(entry);
-
-  if (esPrimera) {
-    if (!d.portfolio) d.portfolio = {};
-    const factor = importe / mensImporte;
-    ACTIVOS.forEach(a => {
-      if (!d.portfolio[a.id]) {
-        d.portfolio[a.id] = { valorActual: a.posicionInicial, totalAportado: a.posicionInicial };
-      }
-      const inc = (a.dcaMensual || 0) * factor;
-      d.portfolio[a.id].totalAportado = (d.portfolio[a.id].totalAportado || 0) + inc;
-      d.portfolio[a.id].valorActual = (d.portfolio[a.id].valorActual || 0) + inc;
-    });
-  }
 
   saveData(d);
   cerrarModal('modalAportacion');
@@ -1122,7 +1210,7 @@ window.renderAll = renderAll;
 renderAll();
 </script>
 
-<!-- FIREBASE SDK (COMPAT) -->
+<!-- FIREBASE SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
