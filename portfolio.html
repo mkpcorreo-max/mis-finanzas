@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Portfolio de Inversión</title>
+<title>Portfolio de Inversión — Panel Avanzado</title>
 <style>
 :root {
   --primary: #6C63FF;
@@ -120,7 +120,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .activo-plat   { font-size:10px; padding:2px 8px; border-radius:8px; font-weight:700; display:inline-block; margin-top:3px; }
 .plat-myinvestor { background:#EDE9FE; color:#6C63FF; }
 .plat-trade      { background:#D1FAE5; color:#065F46; }
-.plat-citibank   { background:#DBEAFE; color:#1D4ED8; }
+.plat-bankinter  { background:#FFEDD5; color:#C2410C; }
 .badge-categoria { font-size:10px; padding:3px 8px; border-radius:8px; font-weight:700; display:inline-block;}
 .cat-rv      { background:#DBEAFE; color:#1D4ED8; }
 .cat-oro     { background:#FEF3C7; color:#D97706; }
@@ -166,7 +166,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .modal-overlay.open { display:flex; }
 .modal {
   background:#fff; border-radius:20px; padding:28px;
-  width:100%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,.3);
+  width:100%; max-width:540px; box-shadow:0 20px 60px rgba(0,0,0,.3);
   position: relative; animation: modalPop 0.25s ease-out;
 }
 @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -200,11 +200,19 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .dca-aport-importe.pendiente { color:var(--text-muted); }
 .btn-sm { padding:6px 14px; font-size:12px; border-radius:8px; }
 
-/* NOTAS */
-.nota-estrategia {
-  background:linear-gradient(135deg,#EDE9FE,#F5F3FF);
-  border:1px solid #C4B5FD; border-radius:14px; padding:18px;
-  font-size:13px; line-height:1.7; color:#4C1D95;
+/* FORMULARIO ESTRATEGIA (CON TOGGLES) */
+.toggle-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.toggle-label { font-size:13px; font-weight:600; color:var(--text); }
+.toggle-switch { position:relative; display:inline-block; width:44px; height:24px; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; cursor:pointer; inset:0; background-color:#CBD5E1; transition:.3s; border-radius:24px; }
+.toggle-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.3s; border-radius:50%; }
+input:checked + .toggle-slider { background-color:var(--primary); }
+input:checked + .toggle-slider:before { transform:translateX(20px); }
+
+.alerta-consistencia {
+  background:#D1FAE5; border:1.5px solid #10B981; border-radius:12px; padding:12px 16px;
+  font-size:12px; color:#065F46; font-weight:600; margin-top:14px; display:flex; align-items:center; gap:8px;
 }
 
 @media(max-width:900px) {
@@ -222,7 +230,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 <div class="header">
   <div>
     <h1>💼 Portfolio de Inversión</h1>
-    <p>Estrategia DCA · MyInvestor · Trade Republic · Citibank</p>
+    <p>Estrategia DCA · MyInvestor · Trade Republic · Bankinter</p>
   </div>
   <div class="nav-links">
     <a href="calculadora-gastos.html" class="nav-link">💰 Gastos</a>
@@ -237,12 +245,12 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
   <div class="dca-hero">
     <div>
       <div class="dca-title">🎯 DCA Táctico — Fase de Acumulación</div>
-      <div class="dca-sub">Despliegue gradual de 20.000 € en 10 meses · Inicio: Nov 2026</div>
+      <div class="dca-sub">Despliegue gradual de <span id="estr_disp">20.000</span> € en <span id="estr_meses">10</span> meses · Inicio: <span id="estr_fecha">Nov 2026</span></div>
 
       <div class="dca-bar-wrap">
         <div class="dca-bar-label">
           <span id="dcaAportadoLabel">0 € aportados</span>
-          <span style="opacity:.5">Objetivo: 20.000 €</span>
+          <span id="dcaObjetivoLabel">Objetivo: 20.000 €</span>
         </div>
         <div class="dca-bar"><div class="dca-bar-fill" id="dcaBarFill" style="width:0%"></div></div>
       </div>
@@ -279,9 +287,9 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
       <div class="kpi-sub" id="kpiRentabEur">—</div>
     </div>
     <div class="kpi k4">
-      <div class="kpi-label">🏦 Fondo emergencia</div>
+      <div class="kpi-label">🏦 Fondo de emergencia</div>
       <div class="kpi-val">15.000 €</div>
-      <div class="kpi-sub">Citibank · 3,0% TAE</div>
+      <div class="kpi-sub">Bankinter · 3,0% TAE</div>
     </div>
     <div class="kpi k5">
       <div class="kpi-label">💧 Liquidez táctica</div>
@@ -298,7 +306,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
         <div class="donut-wrap" id="donutWrap">
           <canvas id="donutCanvas" width="180" height="180"></canvas>
           <div class="donut-center">
-            <div class="donut-center-val">2.000€</div>
+            <div class="donut-center-val" id="dca_mens_estimado">2.000€</div>
             <div class="donut-center-label">/ mes DCA</div>
           </div>
         </div>
@@ -348,19 +356,28 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
       <div class="dca-registro" id="dcaRegistro"></div>
     </div>
 
-    <!-- NOTA ESTRATEGIA -->
+    <!-- CONFIGURADOR INTERACTIVO DE ESTRATEGIA (CON TOGGLES) -->
     <div>
       <div class="card">
-        <div class="card-title">📝 Estrategia</div>
-        <div class="nota-estrategia">
-          <strong>DCA Táctico de 10 meses</strong> para desplegar 20.000 € de capital inicial líquido a razón de <strong>2.000 €/mes</strong>.<br><br>
-          🇺🇸 <strong>S&P 500</strong> — 500€/mes (25%) — Motor principal<br>
-          🇪🇺 <strong>Europa</strong> — 250€/mes (12,5%) — Diversificación geográfica<br>
-          🇮🇳 <strong>India</strong> — 150€/mes (7,5%) — Crecimiento emergente<br>
-          🇨🇳 <strong>China</strong> — 100€/mes (5%) — Exposición asiática<br>
-          🥇 <strong>Oro</strong> — 350€/mes (20%) — Refugio y cobertura<br>
-          💧 <strong>Liquidez</strong> — 650€/mes (30%) — Buffer táctico remunerado<br><br>
-          Una vez completados los 10 meses, la cartera entra en <strong>fase de mantenimiento y rebalanceo periódico</strong>.
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="card-title" style="margin-bottom:0">🎯 Estrategia y Reglas de Inversión</div>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalEstrategia()">✏️ Modificar Estrategia</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;background:linear-gradient(135deg,#EDE9FE,#F5F3FF);border:1px solid #C4B5FD;border-radius:14px;padding:18px;font-size:13px;line-height:1.7;color:#4C1D95">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
+            <div><strong>Capital a desplegar:</strong> <span id="det_capital">20.000 €</span></div>
+            <div><strong>Plazo Despliegue:</strong> <span id="det_plazo">10 meses</span></div>
+            <div><strong>Aportación Mensual:</strong> <span id="det_mensual">2.000 €/mes</span></div>
+            <div><strong>Inicio:</strong> <span id="det_inicio">Nov 2026</span></div>
+          </div>
+          <div style="border-top:1px dashed #C4B5FD;padding-top:10px">
+            <strong>Reglas tácticas activas:</strong>
+            <ul style="margin-top:4px;padding-left:16px;list-style-type:circle" id="estr_reglas_lista">
+            </ul>
+          </div>
+          <div class="alerta-consistencia" id="alertaEstrateia">
+            <span>✅ Registro de aportaciones y cuotas DCA actualizadas dinámicamente con la estrategia.</span>
+          </div>
         </div>
       </div>
 
@@ -380,11 +397,64 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
             <strong style="color:var(--green)">2.600 €</strong>
           </div>
           <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#FEE2E2;border-radius:10px">
-            <span style="font-size:13px">🔒 Fondo emergencia (Citibank)</span>
+            <span style="font-size:13px">🔒 Fondo emergencia (Bankinter Remunerada)</span>
             <strong style="color:var(--red)">15.000 € — INMÓVIL</strong>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICAR ESTRATEGIA -->
+<div class="modal-overlay" id="modalEstrategia">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modalEstrategia')">✕</button>
+    <h3>✏️ Modificar Estrategia y Reglas</h3>
+    <div class="modal-field">
+      <label>Capital total a desplegar (€)</label>
+      <input type="number" id="estrInputCapital" value="20000" min="0" step="1000" />
+    </div>
+    <div class="modal-field">
+      <label>Plazo de despliegue (meses)</label>
+      <select id="estrInputPlazo">
+        <option value="6">6 meses</option>
+        <option value="10" selected>10 meses</option>
+        <option value="12">12 meses</option>
+        <option value="18">18 meses</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Mes de inicio de estrategia</label>
+      <input type="text" id="estrInputInicio" value="Nov 2026" placeholder="Ej: Nov 2026" />
+    </div>
+    
+    <h4 style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:18px 0 8px 0">Reglas tácticas</h4>
+    <div class="toggle-row">
+      <span class="toggle-label">⚡ Permitir aportación extra si el mercado cae más del 10%</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="reglaExtra" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">📈 Auto-rebalancear al finalizar el periodo DCA</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="reglaRebalanceo" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">💧 Mantener siempre un 30% en Liquidez Táctica</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="reglaLiquidez">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="cerrarModal('modalEstrategia')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEstrategia()">💾 Guardar Estrategia</button>
     </div>
   </div>
 </div>
@@ -427,7 +497,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 </div>
 
 <script>
-const ACTIVOS = [
+let ACTIVOS = [
   {
     id: 'sp500',
     nombre: 'Fidelity S&P 500 Index Fund P Acc',
@@ -532,10 +602,10 @@ const ACTIVOS = [
 
 const DCA_MESES = [
   'Nov 2026','Dic 2026','Ene 2027','Feb 2027','Mar 2027',
-  'Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027'
+  'Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027',
+  'Sep 2027','Oct 2027','Nov 2027','Dic 2027','Ene 2028',
+  'Feb 2028','Mar 2028','Abr 2028'
 ];
-const DCA_OBJETIVO   = 20000;
-const DCA_MENS_IMPORTE = 2000;
 
 function getData() {
   try { return JSON.parse(localStorage.getItem('portfolio_data') || '{}'); }
@@ -551,6 +621,22 @@ function saveData(d) {
   if (typeof window.saveDataCloud === 'function') {
     window.saveDataCloud(d);
   }
+}
+
+function getEstrategia() {
+  const d = getData();
+  if (!d.estrategia) {
+    d.estrategia = {
+      capitalTotal: 20000,
+      plazoMeses: 10,
+      inicioMes: 'Nov 2026',
+      permitirExtra: true,
+      autoRebalancear: true,
+      bloqueoLiquidez: false
+    };
+    saveDataLocal(d);
+  }
+  return d.estrategia;
 }
 
 function getPortfolio() {
@@ -585,21 +671,23 @@ function fmtK(n) {
 
 function renderDCA() {
   const aports = getAportaciones();
+  const est = getEstrategia();
   const ejecutados = aports.filter(a => a.ejecutado).length;
   const totalAportado = aports.filter(a => a.ejecutado).reduce((s,a) => s + a.importe, 0);
-  const pct = Math.min((totalAportado / DCA_OBJETIVO) * 100, 100);
+  const pct = Math.min((totalAportado / est.capitalTotal) * 100, 100);
 
   document.getElementById('dcaBarFill').style.width = pct + '%';
   document.getElementById('dcaBigPct').textContent = pct.toFixed(0) + '%';
   document.getElementById('dcaAportadoLabel').textContent = fmtK(totalAportado) + ' aportados';
-  document.getElementById('dcaMesesLabel').textContent = ejecutados + ' / 10 meses';
+  document.getElementById('dcaObjetivoLabel').textContent = `Objetivo: ${fmtK(est.capitalTotal)}`;
+  document.getElementById('dcaMesesLabel').textContent = ejecutados + ` / ${est.plazoMeses} meses`;
 
   const wrap = document.getElementById('dcaMonths');
   wrap.innerHTML = '';
-  DCA_MESES.forEach((mes, i) => {
+  DCA_MESES.slice(0, est.plazoMeses).forEach((mes, i) => {
     const aport = aports.find(a => a.mes === mes);
     const ejecutado = aport && aport.ejecutado;
-    const esActual  = i === ejecutados && ejecutados < 10;
+    const esActual  = i === ejecutados && ejecutados < est.plazoMeses;
     const div = document.createElement('div');
     div.className = 'dca-month-dot ' + (ejecutado ? 'done' : esActual ? 'active' : 'pending');
     div.title = mes + (ejecutado ? ' ✓ ' + fmt(aport.importe) : ' — pendiente');
@@ -614,7 +702,10 @@ function renderDCA() {
 function renderRegistroDCA(aports, ejecutados) {
   const wrap = document.getElementById('dcaRegistro');
   wrap.innerHTML = '';
-  DCA_MESES.forEach((mes, i) => {
+  const est = getEstrategia();
+  const mensImporte = est.capitalTotal / est.plazoMeses;
+  
+  DCA_MESES.slice(0, est.plazoMeses).forEach((mes, i) => {
     const aport = aports.find(a => a.mes === mes);
     const ejecutado = aport && aport.ejecutado;
     const div = document.createElement('div');
@@ -626,7 +717,7 @@ function renderRegistroDCA(aports, ejecutados) {
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span class="dca-aport-importe ${ejecutado ? 'ejecutado' : 'pendiente'}">
-          ${ejecutado ? '+' + fmt(aport.importe) : fmt(DCA_MENS_IMPORTE) + ' previsto'}
+          ${ejecutado ? '+' + fmt(aport.importe) : fmt(mensImporte) + ' previsto'}
         </span>
         ${ejecutado
           ? `<button class="btn btn-danger btn-sm" onclick="borrarAportacion('${mes}')" title="Borrar aportación">🗑️ Borrar</button>`
@@ -642,11 +733,13 @@ function borrarAportacion(mes) {
   if (!confirm(`¿Estás seguro de que deseas eliminar el registro de la aportación de ${mes}?`)) return;
 
   const d = getData();
+  const est = getEstrategia();
+  const mensImporte = est.capitalTotal / est.plazoMeses;
+  
   if (d.aportaciones) {
     const aportEliminada = d.aportaciones.find(a => a.mes === mes);
     if (aportEliminada && d.portfolio) {
-      // Revertir proporcionalmente el capital invertido en posiciones
-      const factor = (aportEliminada.importe || 0) / DCA_MENS_IMPORTE;
+      const factor = (aportEliminada.importe || 0) / mensImporte;
       ACTIVOS.forEach(a => {
         if (d.portfolio[a.id]) {
           const decrem = (a.dcaMensual || 0) * factor;
@@ -687,11 +780,19 @@ function renderKPIs() {
 
 function renderTabla() {
   const p = getPortfolio();
+  const est = getEstrategia();
+  const mensImporteGlobal = est.capitalTotal / est.plazoMeses;
+
   const tbody = document.getElementById('activosTbody');
   tbody.innerHTML = '';
 
-  let totAportado = 0, totValor = 0;
+  let totAportado = 0, totValor = 0, totDcaMensual = 0;
+
   ACTIVOS.forEach(a => {
+    // Recalcular dinámicamente la cuota mensual de cada activo según la estrategia global
+    a.dcaMensual = (a.pctObjetivo / 100) * mensImporteGlobal;
+    totDcaMensual += a.dcaMensual;
+
     const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
     const ganancia = pos.valorActual - pos.totalAportado;
     const rentPct  = pos.totalAportado > 0 ? (ganancia / pos.totalAportado) * 100 : 0;
@@ -704,7 +805,7 @@ function renderTabla() {
       : '<span class="rentab-pct rentab-neu">—</span>';
 
     const platClass = a.plataforma === 'myinvestor' ? 'plat-myinvestor'
-                    : a.plataforma === 'trade' ? 'plat-trade' : 'plat-citibank';
+                    : a.plataforma === 'trade' ? 'plat-trade' : 'plat-bankinter';
     const catClass  = a.categoria === 'rv' ? 'cat-rv' : a.categoria === 'oro' ? 'cat-oro'
                     : a.categoria === 'liquid' ? 'cat-liquid' : 'cat-emerg';
     const dcaStr    = a.dcaMensual > 0 ? `<strong style="color:var(--primary)">${fmt(a.dcaMensual)}</strong>` : '<span style="color:var(--text-muted)">—</span>';
@@ -736,7 +837,7 @@ function renderTabla() {
     <td style="font-weight:900">${fmtK(totAportado)}</td>
     <td style="font-weight:900;color:var(--primary)">${fmtK(totValor)}</td>
     <td><span class="rentab-pct ${totRent >= 0 ? 'rentab-pos' : 'rentab-neg'}">${totRent >= 0 ? '+' : ''}${totRent.toFixed(2)}%</span></td>
-    <td style="color:var(--primary);font-weight:900">2.000 €</td>
+    <td style="color:var(--primary);font-weight:900">${fmtK(mensImporteGlobal)}</td>
   `;
   tbody.appendChild(tr);
 }
@@ -791,7 +892,7 @@ function renderPlataformas() {
   const plats = {
     myinvestor: { nombre: 'MyInvestor', emoji: '🟣', color: '#6C63FF', total: 0, tipos: 'Fondos · Oro · Liquidez' },
     trade:      { nombre: 'Trade Republic', emoji: '🟢', color: '#10B981', total: 0, tipos: 'Efectivo remunerado 2,5%' },
-    citibank:   { nombre: 'Citibank', emoji: '🔵', color: '#3B82F6', total: 15000, tipos: 'Fondo emergencia 3,0% TAE' },
+    bankinter:  { nombre: 'Bankinter', emoji: '🟠', color: '#F97316', total: 15000, tipos: 'Fondo de emergencia 3,0% TAE' },
   };
 
   ACTIVOS.forEach(a => {
@@ -823,6 +924,79 @@ function renderPlataformas() {
     `;
     wrap.appendChild(div);
   });
+}
+
+function renderEstrategia() {
+  const est = getEstrategia();
+  const mensImporte = est.capitalTotal / est.plazoMeses;
+
+  document.getElementById('estr_disp').textContent = est.capitalTotal.toLocaleString('es-ES');
+  document.getElementById('estr_meses').textContent = est.plazoMeses;
+  document.getElementById('estr_fecha').textContent = est.inicioMes;
+  document.getElementById('dca_mens_estimado').textContent = fmtK(mensImporte);
+
+  document.getElementById('det_capital').textContent = fmtK(est.capitalTotal);
+  document.getElementById('det_plazo').textContent = `${est.plazoMeses} meses`;
+  document.getElementById('det_mensual').textContent = `${fmtK(mensImporte)}/mes`;
+  document.getElementById('det_inicio').textContent = est.inicioMes;
+
+  const reglasLista = document.getElementById('estr_reglas_lista');
+  reglasLista.innerHTML = '';
+
+  const reglas = [
+    { act: est.permitirExtra, desc: '⚡ Permitir aportación extra si el mercado cae más del 10% (DCA dinámico)' },
+    { act: est.autoRebalancear, desc: '📈 Auto-rebalancear al finalizar el periodo de 10 meses' },
+    { act: est.bloqueoLiquidez, desc: '💧 Mantener siempre un 30% en Liquidez Táctica de seguridad' }
+  ];
+
+  reglas.forEach(r => {
+    if (r.act) {
+      const li = document.createElement('li');
+      li.textContent = r.desc;
+      reglasLista.appendChild(li);
+    }
+  });
+
+  if (reglasLista.children.length === 0) {
+    reglasLista.innerHTML = '<span style="color:rgba(0,0,0,0.5)">Ninguna regla táctica activa.</span>';
+  }
+}
+
+function abrirModalEstrategia() {
+  const est = getEstrategia();
+  document.getElementById('estrInputCapital').value = est.capitalTotal;
+  document.getElementById('estrInputPlazo').value = est.plazoMeses;
+  document.getElementById('estrInputInicio').value = est.inicioMes;
+  document.getElementById('reglaExtra').checked = est.permitirExtra;
+  document.getElementById('reglaRebalanceo').checked = est.autoRebalancear;
+  document.getElementById('reglaLiquidez').checked = est.bloqueoLiquidez;
+
+  document.getElementById('modalEstrategia').classList.add('open');
+}
+
+function guardarEstrategia() {
+  const cap = parseFloat(document.getElementById('estrInputCapital').value) || 0;
+  const plz = parseInt(document.getElementById('estrInputPlazo').value) || 10;
+  const ini = document.getElementById('estrInputInicio').value.trim() || 'Nov 2026';
+  const ex  = document.getElementById('reglaExtra').checked;
+  const reb = document.getElementById('reglaRebalanceo').checked;
+  const liq = document.getElementById('reglaLiquidez').checked;
+
+  if (cap <= 0) { alert('Introduce un capital objetivo válido'); return; }
+
+  const d = getData();
+  d.estrategia = {
+    capitalTotal: cap,
+    plazoMeses: plz,
+    inicioMes: ini,
+    permitirExtra: ex,
+    autoRebalancear: reb,
+    bloqueoLiquidez: liq
+  };
+
+  saveData(d);
+  cerrarModal('modalEstrategia');
+  renderAll();
 }
 
 function abrirModalActualizar() {
@@ -865,7 +1039,8 @@ function guardarValores() {
 function abrirModalAportacion() {
   const sel = document.getElementById('aportMes');
   sel.innerHTML = DCA_MESES.map(m => `<option value="${m}">${m}</option>`).join('');
-  document.getElementById('aportImporte').value = DCA_MENS_IMPORTE;
+  const est = getEstrategia();
+  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
   document.getElementById('aportNota').value = '';
   document.getElementById('modalAportacion').classList.add('open');
 }
@@ -873,7 +1048,8 @@ function abrirModalAportacion() {
 function abrirModalAportacionMes(mes) {
   const sel = document.getElementById('aportMes');
   sel.innerHTML = DCA_MESES.map(m => `<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
-  document.getElementById('aportImporte').value = DCA_MENS_IMPORTE;
+  const est = getEstrategia();
+  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
   document.getElementById('aportNota').value = '';
   document.getElementById('modalAportacion').classList.add('open');
 }
@@ -885,6 +1061,9 @@ function guardarAportacion() {
   if (importe <= 0) { alert('Introduce un importe válido'); return; }
 
   const d = getData();
+  const est = getEstrategia();
+  const mensImporte = est.capitalTotal / est.plazoMeses;
+  
   if (!d.aportaciones) d.aportaciones = [];
   const idx = d.aportaciones.findIndex(a => a.mes === mes);
   const esPrimera = idx < 0;
@@ -893,10 +1072,9 @@ function guardarAportacion() {
   if (idx >= 0) d.aportaciones[idx] = entry;
   else d.aportaciones.push(entry);
 
-  // Al registrar nueva aportación DCA, auto-distribuir aportado en posiciones
   if (esPrimera) {
     if (!d.portfolio) d.portfolio = {};
-    const factor = importe / DCA_MENS_IMPORTE;
+    const factor = importe / mensImporte;
     ACTIVOS.forEach(a => {
       if (!d.portfolio[a.id]) {
         d.portfolio[a.id] = { valorActual: a.posicionInicial, totalAportado: a.posicionInicial };
@@ -932,6 +1110,7 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 });
 
 function renderAll() {
+  renderEstrategia();
   renderDCA();
   renderKPIs();
   renderTabla();
