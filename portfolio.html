@@ -6,25 +6,66 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Portfolio de Inversión</title>
 <style>
-:root {  --primary: #6C63FF;  --primary-dk: #5A52D5;  --primary-lt: #EDE9FE;  --green: #10B981;  --green-lt: #D1FAE5;  --red: #EF4444;  --red-lt: #FEE2E2;  --yellow: #F59E0B;  --yellow-lt: #FEF3C7;  --blue: #3B82F6;  --blue-lt: #DBEAFE;  --orange: #F97316;  --gray: #64748B;  --bg: #F0F2F5;  --card: #FFFFFF;  --text: #1E293B;  --text-muted: #64748B;  --border: #E2E8F0;}
+:root {
+  --primary: #6C63FF;
+  --primary-dk: #5A52D5;
+  --primary-lt: #EDE9FE;
+  --green: #10B981;
+  --green-lt: #D1FAE5;
+  --red: #EF4444;
+  --red-lt: #FEE2E2;
+  --yellow: #F59E0B;
+  --yellow-lt: #FEF3C7;
+  --blue: #3B82F6;
+  --blue-lt: #DBEAFE;
+  --orange: #F97316;
+  --gray: #64748B;
+  --bg: #F0F2F5;
+  --card: #FFFFFF;
+  --text: #1E293B;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+}
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); }
+body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif; background:var(--bg); color:var(--text); }
+
 /* HEADER */
-.header {  background:linear-gradient(135deg,#0F172A 0%,#1E293B 60%,#0F172A 100%);  color:#fff; padding:24px 32px;  display:flex; align-items:center; justify-content:space-between;  box-shadow:0 4px 24px rgba(0,0,0,.3);}
+.header {
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 60%,#0F172A 100%);
+  color:#fff; padding:24px 32px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow:0 4px 24px rgba(0,0,0,.3);
+}
 .header h1 { font-size:24px; font-weight:900; }
 .header p  { font-size:12px; opacity:.6; margin-top:3px; }
 .nav-links { display:flex; gap:10px; align-items:center; }
-.nav-link {  padding:8px 16px; border-radius:20px; font-size:13px; font-weight:600;  text-decoration:none; border:2px solid rgba(255,255,255,.25); color:#fff; transition:all .2s;}
+.nav-link {
+  padding:8px 16px; border-radius:20px; font-size:13px; font-weight:600;
+  text-decoration:none; border:2px solid rgba(255,255,255,.25); color:#fff; transition:all .2s;
+}
 .nav-link:hover { background:rgba(255,255,255,.1); }
 .nav-link.active { background:var(--primary); border-color:var(--primary); }
+
 /* LAYOUT */
 .container { max-width:1200px; margin:0 auto; padding:28px 20px; }
+
 /* CARDS */
-.card {  background:var(--card); border-radius:16px;  padding:22px; box-shadow:0 2px 16px rgba(0,0,0,.06); margin-bottom:20px;}
-.card-title {  font-size:12px; font-weight:800; text-transform:uppercase;  letter-spacing:1.2px; color:var(--text-muted);  margin-bottom:16px; display:flex; align-items:center; gap:8px;}
+.card {
+  background:var(--card); border-radius:16px;
+  padding:22px; box-shadow:0 2px 16px rgba(0,0,0,.06); margin-bottom:20px;
+}
+.card-title {
+  font-size:12px; font-weight:800; text-transform:uppercase;
+  letter-spacing:1.2px; color:var(--text-muted);
+  margin-bottom:16px; display:flex; align-items:center; gap:8px;
+}
+
 /* KPI STRIP */
 .kpi-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:20px; }
-.kpi {  background:var(--card); border-radius:14px; padding:16px 18px;  box-shadow:0 2px 12px rgba(0,0,0,.05); border-top:3px solid var(--border);}
+.kpi {
+  background:var(--card); border-radius:14px; padding:16px 18px;
+  box-shadow:0 2px 12px rgba(0,0,0,.05); border-top:3px solid var(--border);
+}
 .kpi.k1 { border-top-color:var(--primary); }
 .kpi.k2 { border-top-color:var(--green); }
 .kpi.k3 { border-top-color:var(--yellow); }
@@ -33,8 +74,13 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .kpi-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:4px; }
 .kpi-val   { font-size:20px; font-weight:900; }
 .kpi-sub   { font-size:10px; color:var(--text-muted); margin-top:2px; }
+
 /* DCA PROGRESS HERO */
-.dca-hero {  background:linear-gradient(135deg,#0F172A,#1E293B);  border-radius:20px; padding:28px 32px; color:#fff; margin-bottom:20px;  display:grid; grid-template-columns:1fr auto; gap:24px; align-items:center;}
+.dca-hero {
+  background:linear-gradient(135deg,#0F172A,#1E293B);
+  border-radius:20px; padding:28px 32px; color:#fff; margin-bottom:20px;
+  display:grid; grid-template-columns:1fr auto; gap:24px; align-items:center;
+}
 .dca-title  { font-size:22px; font-weight:900; margin-bottom:4px; }
 .dca-sub    { font-size:13px; opacity:.6; margin-bottom:20px; }
 .dca-bar-wrap { margin-bottom:12px; }
@@ -42,7 +88,11 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .dca-bar { height:14px; background:rgba(255,255,255,.1); border-radius:10px; overflow:hidden; }
 .dca-bar-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#6C63FF,#10B981); transition:width .8s; }
 .dca-months { display:flex; gap:6px; margin-top:16px; flex-wrap:wrap; }
-.dca-month-dot {  width:34px; height:34px; border-radius:50%; border:2px solid rgba(255,255,255,.2);  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;  color:rgba(255,255,255,.5); transition:all .2s; cursor:pointer;}
+.dca-month-dot {
+  width:34px; height:34px; border-radius:50%; border:2px solid rgba(255,255,255,.2);
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;
+  color:rgba(255,255,255,.5); transition:all .2s; cursor:pointer;
+}
 .dca-month-dot.done { background:var(--green); border-color:var(--green); color:#fff; }
 .dca-month-dot.active { background:var(--primary); border-color:var(--primary); color:#fff; box-shadow:0 0 0 4px rgba(108,99,255,.3); }
 .dca-month-dot.pending { border-style:dashed; }
@@ -50,12 +100,18 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .dca-big { font-size:42px; font-weight:900; color:var(--green); line-height:1; }
 .dca-big-label { font-size:12px; opacity:.6; margin-top:4px; }
 .dca-objetivo { font-size:13px; opacity:.5; margin-top:8px; }
+
 /* GRID */
 .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+
 /* TABLA ACTIVOS */
 .activos-table { width:100%; border-collapse:collapse; }
-.activos-table th {  text-align:left; font-size:10px; font-weight:800; text-transform:uppercase;  letter-spacing:1px; color:var(--text-muted); padding:10px 12px;  border-bottom:2px solid var(--border); white-space:nowrap;}
+.activos-table th {
+  text-align:left; font-size:10px; font-weight:800; text-transform:uppercase;
+  letter-spacing:1px; color:var(--text-muted); padding:10px 12px;
+  border-bottom:2px solid var(--border); white-space:nowrap;
+}
 .activos-table td { padding:14px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
 .activos-table tr:last-child td { border-bottom:none; }
 .activos-table tr:hover td { background:#F8FAFF; }
@@ -65,7 +121,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .plat-myinvestor { background:#EDE9FE; color:#6C63FF; }
 .plat-trade      { background:#D1FAE5; color:#065F46; }
 .plat-citibank   { background:#DBEAFE; color:#1D4ED8; }
-.badge-categoria {  font-size:10px; padding:3px 8px; border-radius:8px; font-weight:700; display:inline-block;}
+.badge-categoria { font-size:10px; padding:3px 8px; border-radius:8px; font-weight:700; display:inline-block;}
 .cat-rv      { background:#DBEAFE; color:#1D4ED8; }
 .cat-oro     { background:#FEF3C7; color:#D97706; }
 .cat-liquid  { background:#D1FAE5; color:#065F46; }
@@ -75,20 +131,23 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .rentab-pos   { background:var(--green-lt); color:var(--green); }
 .rentab-neg   { background:var(--red-lt); color:var(--red); }
 .rentab-neu   { background:#F1F5F9; color:var(--gray); }
+
 /* DONUT CHART */
 .donut-wrap { position:relative; width:180px; height:180px; margin:0 auto; }
 .donut-wrap canvas { position:absolute; top:0; left:0; }
-.donut-center {  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);  text-align:center;}
+.donut-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
 .donut-center-val   { font-size:18px; font-weight:900; color:var(--text); }
 .donut-center-label { font-size:10px; color:var(--text-muted); margin-top:2px; }
+
 /* LEYENDA */
 .leyenda { display:flex; flex-direction:column; gap:8px; }
 .ley-item { display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .ley-dot  { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 .ley-name { font-size:12px; flex:1; }
 .ley-pct  { font-size:12px; font-weight:700; }
+
 /* PLATAFORMAS */
-.plat-card {  border-radius:14px; padding:18px; border:2px solid var(--border);  display:flex; flex-direction:column; gap:10px;}
+.plat-card { border-radius:14px; padding:18px; border:2px solid var(--border); display:flex; flex-direction:column; gap:10px; }
 .plat-header { display:flex; align-items:center; gap:10px; }
 .plat-logo   { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; }
 .plat-nombre { font-size:15px; font-weight:800; }
@@ -97,25 +156,42 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .plat-sub    { font-size:11px; color:var(--text-muted); margin-top:2px; }
 .plat-bar    { height:6px; background:var(--border); border-radius:6px; overflow:hidden; margin-top:4px; }
 .plat-bar-fill { height:100%; border-radius:6px; }
+
 /* MODAL / EDIT */
-.modal-overlay {  display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);  z-index:1000; align-items:center; justify-content:center; padding:20px;}
+.modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
+  z-index:1000; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter: blur(4px);
+}
 .modal-overlay.open { display:flex; }
-.modal {  background:#fff; border-radius:20px; padding:28px;  width:100%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal {
+  background:#fff; border-radius:20px; padding:28px;
+  width:100%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,.3);
+  position: relative; animation: modalPop 0.25s ease-out;
+}
+@keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
 .modal h3 { font-size:18px; font-weight:800; margin-bottom:20px; }
 .modal-field { margin-bottom:14px; }
 .modal-field label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); display:block; margin-bottom:5px; }
-.modal-field input { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; outline:none; }
-.modal-field input:focus { border-color:var(--primary); }
+.modal-field input, .modal-field select { width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; outline:none; }
+.modal-field input:focus, .modal-field select:focus { border-color:var(--primary); }
 .modal-btns { display:flex; gap:10px; margin-top:20px; }
 .btn { padding:11px 20px; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; }
 .btn-primary { background:var(--primary); color:#fff; flex:1; }
 .btn-primary:hover { background:var(--primary-dk); }
 .btn-cancel  { background:#F1F5F9; color:var(--text-muted); }
+.btn-secondary { background:#EDE9FE; color:var(--primary); }
 .btn-danger  { background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; }
 .btn-danger:hover { background:#DC2626; color:#FFF; }
+
 /* REGISTRO DCA */
 .dca-registro { display:flex; flex-direction:column; gap:10px; }
-.dca-aport-row {  display:flex; align-items:center; justify-content:space-between;  padding:12px 16px; border-radius:12px; border:1.5px solid var(--border);  transition:all .2s;}
+.dca-aport-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-radius:12px; border:1.5px solid var(--border);
+  transition:all .2s;
+}
 .dca-aport-row.ejecutado { border-color:var(--green); background:var(--green-lt); }
 .dca-aport-row.pendiente { border-color:var(--border); background:#FAFAFA; opacity:.7; }
 .dca-aport-mes  { font-weight:700; font-size:14px; }
@@ -123,9 +199,21 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .dca-aport-importe.ejecutado { color:var(--green); }
 .dca-aport-importe.pendiente { color:var(--text-muted); }
 .btn-sm { padding:6px 14px; font-size:12px; border-radius:8px; }
+
 /* NOTAS */
-.nota-estrategia {  background:linear-gradient(135deg,#EDE9FE,#F5F3FF);  border:1px solid #C4B5FD; border-radius:14px; padding:18px;  font-size:13px; line-height:1.7; color:#4C1D95;}
-@media(max-width:900px) {  .kpi-strip { grid-template-columns:repeat(3,1fr); }  .grid-2, .grid-3 { grid-template-columns:1fr; }  .dca-hero { grid-template-columns:1fr; }  .dca-stats { text-align:left; }  .header { flex-direction:column; gap:12px; }}
+.nota-estrategia {
+  background:linear-gradient(135deg,#EDE9FE,#F5F3FF);
+  border:1px solid #C4B5FD; border-radius:14px; padding:18px;
+  font-size:13px; line-height:1.7; color:#4C1D95;
+}
+
+@media(max-width:900px) {
+  .kpi-strip { grid-template-columns:repeat(3,1fr); }
+  .grid-2, .grid-3 { grid-template-columns:1fr; }
+  .dca-hero { grid-template-columns:1fr; }
+  .dca-stats { text-align:left; }
+  .header { flex-direction:column; gap:12px; }
+}
 </style>
 </head>
 <body>
@@ -229,7 +317,10 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
   <div class="card" style="margin-bottom:20px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div class="card-title" style="margin-bottom:0">📋 Posiciones actuales</div>
-      <button class="btn btn-primary btn-sm" onclick="abrirModalActualizar()">✏️ Actualizar valores</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="exportarBackupJSON()">📥 Backup</button>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalActualizar()">✏️ Actualizar valores</button>
+      </div>
     </div>
     <div style="overflow-x:auto">
       <table class="activos-table" id="activosTable">
@@ -301,6 +392,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 <!-- MODAL ACTUALIZAR VALORES -->
 <div class="modal-overlay" id="modalActualizar">
   <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modalActualizar')">✕</button>
     <h3>✏️ Actualizar valor actual</h3>
     <div id="modalActivosForms"></div>
     <div class="modal-btns">
@@ -313,15 +405,15 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 <!-- MODAL APORTACIÓN DCA -->
 <div class="modal-overlay" id="modalAportacion">
   <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modalAportacion')">✕</button>
     <h3>➕ Registrar aportación mensual</h3>
     <div class="modal-field">
       <label>Mes de aportación</label>
-      <select id="aportMes" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none">
-      </select>
+      <select id="aportMes"></select>
     </div>
     <div class="modal-field">
       <label>Importe ejecutado (€)</label>
-      <input type="number" id="aportImporte" value="2000" min="0" step="100" />
+      <input type="number" id="aportImporte" value="2000" min="0" step="100" inputmode="decimal" />
     </div>
     <div class="modal-field">
       <label>Notas (opcional)</label>
@@ -546,12 +638,24 @@ function renderRegistroDCA(aports, ejecutados) {
   });
 }
 
-// FUNCIÓN PARA BORRAR APORTACIÓN/INGRESO
 function borrarAportacion(mes) {
   if (!confirm(`¿Estás seguro de que deseas eliminar el registro de la aportación de ${mes}?`)) return;
 
   const d = getData();
   if (d.aportaciones) {
+    const aportEliminada = d.aportaciones.find(a => a.mes === mes);
+    if (aportEliminada && d.portfolio) {
+      // Revertir proporcionalmente el capital invertido en posiciones
+      const factor = (aportEliminada.importe || 0) / DCA_MENS_IMPORTE;
+      ACTIVOS.forEach(a => {
+        if (d.portfolio[a.id]) {
+          const decrem = (a.dcaMensual || 0) * factor;
+          d.portfolio[a.id].totalAportado = Math.max(0, (d.portfolio[a.id].totalAportado || 0) - decrem);
+          d.portfolio[a.id].valorActual = Math.max(0, (d.portfolio[a.id].valorActual || 0) - decrem);
+        }
+      });
+    }
+
     d.aportaciones = d.aportaciones.filter(a => a.mes !== mes);
     saveData(d);
     renderAll();
@@ -732,8 +836,8 @@ function abrirModalActualizar() {
     div.innerHTML = `
       <label>${a.emoji} ${a.nombre.substring(0,40)}</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <input type="number" id="val_${a.id}" placeholder="Valor actual €" value="${pos.valorActual || ''}" min="0" step="0.01" />
-        <input type="number" id="aport_${a.id}" placeholder="Total aportado €" value="${pos.totalAportado || ''}" min="0" step="0.01" />
+        <input type="number" id="val_${a.id}" placeholder="Valor actual €" value="${pos.valorActual || ''}" min="0" step="0.01" inputmode="decimal" />
+        <input type="number" id="aport_${a.id}" placeholder="Total aportado €" value="${pos.totalAportado || ''}" min="0" step="0.01" inputmode="decimal" />
       </div>
       <div style="display:flex;gap:6px;font-size:10px;color:var(--text-muted);margin-top:3px">
         <span style="flex:1;text-align:center">Valor actual</span>
@@ -783,12 +887,40 @@ function guardarAportacion() {
   const d = getData();
   if (!d.aportaciones) d.aportaciones = [];
   const idx = d.aportaciones.findIndex(a => a.mes === mes);
+  const esPrimera = idx < 0;
   const entry = { mes, importe, nota, ejecutado: true, fecha: new Date().toISOString() };
+
   if (idx >= 0) d.aportaciones[idx] = entry;
   else d.aportaciones.push(entry);
+
+  // Al registrar nueva aportación DCA, auto-distribuir aportado en posiciones
+  if (esPrimera) {
+    if (!d.portfolio) d.portfolio = {};
+    const factor = importe / DCA_MENS_IMPORTE;
+    ACTIVOS.forEach(a => {
+      if (!d.portfolio[a.id]) {
+        d.portfolio[a.id] = { valorActual: a.posicionInicial, totalAportado: a.posicionInicial };
+      }
+      const inc = (a.dcaMensual || 0) * factor;
+      d.portfolio[a.id].totalAportado = (d.portfolio[a.id].totalAportado || 0) + inc;
+      d.portfolio[a.id].valorActual = (d.portfolio[a.id].valorActual || 0) + inc;
+    });
+  }
+
   saveData(d);
   cerrarModal('modalAportacion');
   renderAll();
+}
+
+function exportarBackupJSON() {
+  const data = getData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `portfolio_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function cerrarModal(id) {
