@@ -123,6 +123,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .cat-rv      { background:#DBEAFE; color:#1D4ED8; }
 .cat-oro     { background:#FEF3C7; color:#D97706; }
 .cat-liquid  { background:#D1FAE5; color:#065F46; }
+.cat-emerg   { background:#FEE2E2; color:#991B1B; }
 .valor-actual { font-size:15px; font-weight:900; }
 .rentab-pct   { font-size:12px; font-weight:700; padding:3px 8px; border-radius:8px; }
 .rentab-pos   { background:var(--green-lt); color:var(--green); }
@@ -159,7 +160,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 .modal-overlay.open { display:flex; }
 .modal {
   background:#fff; border-radius:20px; padding:26px;
-  width:100%; max-width:700px; box-shadow:0 20px 60px rgba(0,0,0,.25);
+  width:100%; max-width:880px; box-shadow:0 20px 60px rgba(0,0,0,.25);
   position: relative; max-height: 90vh; overflow-y: auto;
 }
 .modal-close { position: absolute; top: 18px; right: 18px; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
@@ -305,7 +306,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
     <!-- DISTRIBUCIÓN DONUT -->
     <div class="card" style="margin-bottom:0">
       <div class="card-title">
-        <span>🥧 Distribución Objetivo</span>
+        <span>🥧 Distribución del Portfolio</span>
       </div>
       <div style="display:flex;align-items:center;gap:20px">
         <div class="donut-wrap">
@@ -336,7 +337,7 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
         <div style="border-top:1px dashed #C4B5FD;padding-top:8px;font-size:12px">
           <strong>Reglas tácticas:</strong>
           <ul style="margin-top:2px;padding-left:14px">
-            <li>Asignación proporcional por peso de fondo.</li>
+            <li>Asignación DCA directa en euros (€/mes) por fondo.</li>
             <li>Rebalanceo periódico al finalizar el plazo.</li>
           </ul>
         </div>
@@ -354,21 +355,21 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 
 <!-- MODAL GESTIÓN DE ACTIVOS -->
 <div class="modal-overlay" id="modalGestionActivos">
-  <div class="modal">
+  <div class="modal" style="max-width: 920px;">
     <button class="modal-close" onclick="cerrarModal('modalGestionActivos')">✕</button>
     <h3>⚙️ Gestión y Configuración de Activos</h3>
-    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Modifica el nombre, ticker, plataforma o elimina cualquier fondo de la cartera de forma manual.</p>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Modifica el nombre, ticker, categoría, plataforma y la cantidad fija mensual en **€/mes** que deseas aportar a cada fondo.</p>
     
     <div id="listaActivosConfig" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
 
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F8F9FF;border-radius:10px;margin-bottom:20px">
       <button class="btn btn-secondary btn-sm" onclick="agregarNuevoActivoConfig()">➕ Añadir nuevo fondo</button>
-      <div style="font-size:12px;color:var(--text-muted)">Gestión 100% manual por activo</div>
+      <div id="sumaDcaConfig" style="font-weight:800;font-size:13px">Suma DCA mensual: 0 €/mes</div>
     </div>
 
     <div class="modal-btns">
       <button class="btn btn-cancel" onclick="cerrarModal('modalGestionActivos')">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarConfiguracionActivos()">💾 Guardar cambios</button>
+      <button class="btn btn-primary" onclick="guardarConfiguracionActivos()">💾 Guardar cambios de cartera</button>
     </div>
   </div>
 </div>
@@ -441,13 +442,13 @@ body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
 
 <script>
 const DEFAULT_ACTIVOS = [
-  { id: 'sp500', nombre: 'Fidelity S&P 500 Index Fund', ticker: 'IE00BYX5NX33', emoji: '🇺🇸', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#6C63FF', posicionInicial: 2500, esLiquidez: false },
-  { id: 'europa', nombre: 'Vanguard European Stock Index', ticker: 'IE00B945VV12', emoji: '🇪🇺', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#3B82F6', posicionInicial: 1800, esLiquidez: false },
-  { id: 'india', nombre: 'Franklin India Fund Class A', ticker: 'LU0231205187', emoji: '🇮🇳', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#F97316', posicionInicial: 0, esLiquidez: false },
-  { id: 'china', nombre: 'Franklin FTSE China Index Fund', ticker: 'IE00BHZRR150', emoji: '🇨🇳', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#EF4444', posicionInicial: 0, esLiquidez: false },
-  { id: 'oro', nombre: 'iShares Physical Gold ETC', ticker: 'IE00B4ND3602', emoji: '🥇', categoria: 'oro', catLabel: 'Oro / Refugio', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#F59E0B', posicionInicial: 0, esLiquidez: false },
-  { id: 'liquidez_mi', nombre: 'Efectivo Remunerado / Groupama', ticker: 'Monetario', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#10B981', posicionInicial: 3500, esLiquidez: true },
-  { id: 'liquidez_tr', nombre: 'Efectivo Remunerado Trade Republic', ticker: '2,5% TAE', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'trade', platLabel: 'Trade Republic', color: '#34D399', posicionInicial: 2600, esLiquidez: true }
+  { id: 'sp500', nombre: 'Fidelity S&P 500 Index Fund P Acc', ticker: 'IE00BYX5NX33', emoji: '🇺🇸', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#6C63FF', posicionInicial: 2500, esLiquidez: false, dcaMensual: 400 },
+  { id: 'europa', nombre: 'Vanguard European Stock Index EUR Acc', ticker: 'IE00B945VV12', emoji: '🇪🇺', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#3B82F6', posicionInicial: 1800, esLiquidez: false, dcaMensual: 400 },
+  { id: 'oro', nombre: 'Physical Gold USD acc', ticker: 'IE00B4ND3602', emoji: '🥇', categoria: 'oro', catLabel: 'Oro / Refugio', plataforma: 'trade', platLabel: 'Trade Republic', color: '#F59E0B', posicionInicial: 0, esLiquidez: false, dcaMensual: 400 },
+  { id: 'bitcoin', nombre: 'BITCOIN', ticker: 'N/D', emoji: '📈', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'trade', platLabel: 'Trade Republic', color: '#EF4444', posicionInicial: 749, esLiquidez: false, dcaMensual: 400 },
+  { id: 'emerging', nombre: 'FIDELITY MSCI EMERGING MARKETS', ticker: 'N/D', emoji: '📈', categoria: 'rv', catLabel: 'Renta Variable', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#34D399', posicionInicial: 2500, esLiquidez: false, dcaMensual: 400 },
+  { id: 'liquidez_mi', nombre: 'Efectivo Remunerado / Groupama Trésorerie IC', ticker: 'Monetario', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'myinvestor', platLabel: 'MyInvestor', color: '#10B981', posicionInicial: 3500, esLiquidez: true, dcaMensual: 0 },
+  { id: 'liquidez_tr', nombre: 'Efectivo Remunerado Trade Republic', ticker: '2,5% TAE', emoji: '💧', categoria: 'liquid', catLabel: 'Liquidez Táctica', plataforma: 'trade', platLabel: 'Trade Republic', color: '#34D399', posicionInicial: 2600, esLiquidez: true, dcaMensual: 0 }
 ];
 
 const DCA_MESES = ['Nov 2026','Dic 2026','Ene 2027','Feb 2027','Mar 2027','Abr 2027','May 2027','Jun 2027','Jul 2027','Ago 2027','Sep 2027','Oct 2027'];
@@ -471,11 +472,6 @@ function getActivos() {
   if (!d.activosList || !Array.isArray(d.activosList)) {
     d.activosList = DEFAULT_ACTIVOS;
     saveDataLocal(d);
-  }
-  const dcaAssets = d.activosList.filter(a => !a.esLiquidez);
-  if (dcaAssets.length > 0) {
-    const p = parseFloat((100 / dcaAssets.length).toFixed(2));
-    dcaAssets.forEach(a => a.pctObjetivo = p);
   }
   return d.activosList;
 }
@@ -527,8 +523,14 @@ function renderDCA() {
 
   document.getElementById('st_cap').textContent = fmtK(est.capitalTotal);
   document.getElementById('st_plazo').textContent = est.plazoMeses;
-  document.getElementById('st_mensual').textContent = fmtK(est.capitalTotal / est.plazoMeses) + '/mes';
+  
+  // Calcular suma total configurada de DCA mensual en euros
+  let sumaDcaMensual = 0;
+  getActivos().forEach(a => { if (!a.esLiquidez) sumaDcaMensual += (a.dcaMensual || 0); });
+  
+  document.getElementById('st_mensual').textContent = fmtK(sumaDcaMensual) + '/mes';
   document.getElementById('st_ini').textContent = est.inicioMes;
+  document.getElementById('dca_mens_estimado').textContent = fmtK(sumaDcaMensual);
 
   const wrap = document.getElementById('dcaMonths');
   wrap.innerHTML = '';
@@ -543,14 +545,13 @@ function renderDCA() {
     wrap.appendChild(div);
   });
 
-  renderRegistroDCA(aports, ejecutados);
+  renderRegistroDCA(aports, ejecutados, sumaDcaMensual);
 }
 
-function renderRegistroDCA(aports, ejecutados) {
+function renderRegistroDCA(aports, ejecutados, sumaDcaMensual) {
   const wrap = document.getElementById('dcaRegistro');
   wrap.innerHTML = '';
   const est = getEstrategia();
-  const mensImporte = est.capitalTotal / est.plazoMeses;
   
   DCA_MESES.slice(0, est.plazoMeses).forEach((mes, i) => {
     const aport = aports.find(a => a.mes === mes);
@@ -564,9 +565,9 @@ function renderRegistroDCA(aports, ejecutados) {
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span class="dca-aport-importe ${ejecutado ? 'ejecutado' : 'pendiente'}">
-          ${ejecutado ? '+' + fmt(aport.importe) : fmt(mensImporte) + ' previsto'}
+          ${ejecutado ? '+' + fmt(aport.importe) : fmt(sumaDcaMensual) + ' previsto'}
         </span>
-        ${ejecutado ? `<button class="btn btn-danger btn-sm" onclick="borrarAportacion('${mes}')">🗑️</button>` : `<button class="btn btn-primary btn-sm" onclick="abrirModalAportacionMes('${mes}')">Registrar</button>`}
+        ${ejecutado ? `<button class="btn btn-danger btn-sm" onclick="borrarAportacion('${mes}')">🗑️</button>` : `<button class="btn btn-primary btn-sm" onclick="abrirModalAportacionMes('${mes}', ${sumaDcaMensual})">Registrar</button>`}
       </div>
     `;
     wrap.appendChild(div);
@@ -605,15 +606,13 @@ function renderKPIs() {
 
 function renderTabla() {
   const p = getPortfolio();
-  const est = getEstrategia();
-  const mensGlobal = est.capitalTotal / est.plazoMeses;
   const activos = getActivos();
-  document.getElementById('dca_mens_estimado').textContent = fmtK(mensGlobal);
 
-  let totalCarteraVal = 0;
+  let totalCarteraVal = 0, sumaDcaGlobal = 0;
   activos.forEach(a => {
     const pos = p[a.id] || { valorActual: 0 };
     totalCarteraVal += pos.valorActual;
+    if (!a.esLiquidez) sumaDcaGlobal += (a.dcaMensual || 0);
   });
 
   const tbody = document.getElementById('activosTbody');
@@ -624,7 +623,7 @@ function renderTabla() {
   activos.forEach(a => {
     const pos = p[a.id] || { valorActual: 0, totalAportado: 0 };
     const pesoReal = totalCarteraVal > 0 ? (pos.valorActual / totalCarteraVal) * 100 : 0;
-    const dcaMensual = a.esLiquidez ? 0 : (a.pctObjetivo / 100) * mensGlobal;
+    const dcaMensual = a.esLiquidez ? 0 : (a.dcaMensual || 0);
 
     const ganancia = pos.valorActual - pos.totalAportado;
     const rentPct = pos.totalAportado > 0 ? (ganancia / pos.totalAportado) * 100 : 0;
@@ -634,7 +633,7 @@ function renderTabla() {
     const rentClass = rentPct > 0.5 ? 'rentab-pos' : rentPct < -0.5 ? 'rentab-neg' : 'rentab-neu';
     const rentStr = pos.totalAportado > 0 ? `<span class="rentab-pct ${rentClass}">${rentPct >= 0 ? '+' : ''}${rentPct.toFixed(2)}%</span>` : '—';
     const platClass = a.plataforma === 'myinvestor' ? 'plat-myinvestor' : a.plataforma === 'trade' ? 'plat-trade' : 'plat-bankinter';
-    const catClass = a.categoria === 'rv' ? 'cat-rv' : a.categoria === 'oro' ? 'cat-oro' : 'cat-liquid';
+    const catClass = a.categoria === 'rv' ? 'cat-rv' : a.categoria === 'oro' ? 'cat-oro' : a.categoria === 'liquid' ? 'cat-liquid' : 'cat-emerg';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -642,7 +641,7 @@ function renderTabla() {
         <div class="activo-nombre">${a.emoji || '💼'} ${a.nombre}</div>
         <div class="activo-ticker">${a.ticker || 'N/D'}</div>
       </td>
-      <td><span class="badge-categoria ${catClass}">${a.catLabel}</span></td>
+      <td><span class="badge-categoria ${catClass}">${a.catLabel || 'Renta Variable'}</span></td>
       <td><span class="activo-plat ${platClass}">${a.platLabel}</span></td>
       <td style="font-weight:700">${pesoReal.toFixed(1)}%</td>
       <td style="font-weight:600">${pos.totalAportado > 0 ? fmtK(pos.totalAportado) : '—'}</td>
@@ -663,7 +662,7 @@ function renderTabla() {
     <td>${fmtK(totAportado)}</td>
     <td style="color:var(--primary)">${fmtK(totValor)}</td>
     <td><span class="rentab-pct ${totRent >= 0 ? 'rentab-pos' : 'rentab-neg'}">${totRent >= 0 ? '+' : ''}${totRent.toFixed(2)}%</span></td>
-    <td style="color:var(--primary)">${fmtK(mensGlobal)}</td>
+    <td style="color:var(--primary)">${fmtK(sumaDcaGlobal)}</td>
   `;
   tbody.appendChild(tr);
 }
@@ -716,7 +715,7 @@ function renderDonut() {
   });
 }
 
-// MODAL GESTIÓN MANUAL DE ACTIVOS
+// MODAL GESTIÓN MANUAL DE ACTIVOS (CON CANTIDAD FIJA €/mes)
 function abrirModalGestionActivos() {
   const activos = getActivos();
   const container = document.getElementById('listaActivosConfig');
@@ -724,21 +723,42 @@ function abrirModalGestionActivos() {
 
   activos.forEach((a, idx) => {
     const div = document.createElement('div');
-    div.style.cssText = 'display:grid;grid-template-columns:30px 1fr 110px 110px 40px;gap:8px;align-items:center;background:#FAFAFA;padding:8px;border-radius:8px;border:1px solid var(--border)';
+    div.style.cssText = 'display:grid;grid-template-columns:35px 1fr 100px 130px 110px 95px 40px;gap:8px;align-items:center;background:#FAFAFA;padding:8px;border-radius:8px;border:1px solid var(--border)';
     div.innerHTML = `
-      <input type="text" value="${a.emoji || '💼'}" id="cfg_emoji_${idx}" style="text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <input type="text" value="${a.emoji || '💼'}" id="cfg_emoji_${idx}" style="text-align:center;padding:6px;border:1px solid var(--border);border-radius:6px" title="Emoji" />
       <input type="text" value="${a.nombre}" id="cfg_nombre_${idx}" placeholder="Nombre" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
-      <input type="text" value="${a.ticker || ''}" id="cfg_ticker_${idx}" placeholder="Ticker / ISIN" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <input type="text" value="${a.ticker || ''}" id="cfg_ticker_${idx}" placeholder="Ticker" style="padding:6px;border:1px solid var(--border);border-radius:6px" />
+      <select id="cfg_cat_${idx}" style="padding:6px;border:1px solid var(--border);border-radius:6px">
+        <option value="rv" ${a.categoria==='rv'?'selected':''}>Renta Variable</option>
+        <option value="oro" ${a.categoria==='oro'?'selected':''}>Oro / Refugio</option>
+        <option value="liquid" ${a.categoria==='liquid'?'selected':''}>Liquidez Táctica</option>
+        <option value="emerg" ${a.categoria==='emerg'?'selected':''}>Emergentes / Otros</option>
+      </select>
       <select id="cfg_plat_${idx}" style="padding:6px;border:1px solid var(--border);border-radius:6px">
         <option value="myinvestor" ${a.plataforma==='myinvestor'?'selected':''}>MyInvestor</option>
         <option value="trade" ${a.plataforma==='trade'?'selected':''}>Trade Rep.</option>
       </select>
+      <input type="number" value="${a.esLiquidez ? 0 : (a.dcaMensual || 0)}" id="cfg_dca_${idx}" placeholder="€/mes" min="0" step="50" ${a.esLiquidez?'disabled':''} style="padding:6px;border:1px solid var(--border);border-radius:6px" oninput="calcularSumaDcaConfig()" title="Aportación mensual en €" />
       <button class="btn btn-danger btn-sm" onclick="eliminarActivoConfig(${idx})">🗑️</button>
     `;
     container.appendChild(div);
   });
 
+  calcularSumaDcaConfig();
   document.getElementById('modalGestionActivos').classList.add('open');
+}
+
+function calcularSumaDcaConfig() {
+  const activos = getActivos();
+  let suma = 0;
+  activos.forEach((a, idx) => {
+    if (!a.esLiquidez) {
+      const input = document.getElementById(`cfg_dca_${idx}`);
+      if (input) suma += parseFloat(input.value) || 0;
+    }
+  });
+  const el = document.getElementById('sumaDcaConfig');
+  el.textContent = `Suma DCA mensual: ${suma.toLocaleString('es-ES')} €/mes`;
 }
 
 function agregarNuevoActivoConfig() {
@@ -754,7 +774,8 @@ function agregarNuevoActivoConfig() {
     platLabel: 'MyInvestor',
     color: '#6C63FF',
     posicionInicial: 0,
-    esLiquidez: false
+    esLiquidez: false,
+    dcaMensual: 0
   });
   saveDataLocal({ ...getData(), activosList: activos });
   abrirModalGestionActivos();
@@ -770,12 +791,26 @@ function eliminarActivoConfig(idx) {
 
 function guardarConfiguracionActivos() {
   const activos = getActivos();
+
   activos.forEach((a, idx) => {
     a.emoji = document.getElementById(`cfg_emoji_${idx}`).value.trim() || '💼';
     a.nombre = document.getElementById(`cfg_nombre_${idx}`).value.trim() || 'Fondo';
     a.ticker = document.getElementById(`cfg_ticker_${idx}`).value.trim() || 'N/D';
     a.plataforma = document.getElementById(`cfg_plat_${idx}`).value;
     a.platLabel = a.plataforma === 'myinvestor' ? 'MyInvestor' : 'Trade Republic';
+    
+    const catVal = document.getElementById(`cfg_cat_${idx}`).value;
+    a.categoria = catVal;
+    if (catVal === 'rv') a.catLabel = 'Renta Variable';
+    else if (catVal === 'oro') a.catLabel = 'Oro / Refugio';
+    else if (catVal === 'liquid') a.catLabel = 'Liquidez Táctica';
+    else a.catLabel = 'Emergentes / Otros';
+
+    if (!a.esLiquidez) {
+      a.dcaMensual = parseFloat(document.getElementById(`cfg_dca_${idx}`).value) || 0;
+    } else {
+      a.dcaMensual = 0;
+    }
   });
 
   const d = getData();
@@ -839,16 +874,16 @@ function guardarValores() {
 function abrirModalAportacion() {
   const sel = document.getElementById('aportMes');
   sel.innerHTML = DCA_MESES.map(m => `<option value="${m}">${m}</option>`).join('');
-  const est = getEstrategia();
-  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
+  let sumaDca = 0;
+  getActivos().forEach(a => { if (!a.esLiquidez) sumaDca += (a.dcaMensual || 0); });
+  document.getElementById('aportImporte').value = sumaDca;
   document.getElementById('modalAportacion').classList.add('open');
 }
 
-function abrirModalAportacionMes(mes) {
+function abrirModalAportacionMes(mes, sumaDcaMensual) {
   const sel = document.getElementById('aportMes');
   sel.innerHTML = DCA_MESES.map(m => `<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
-  const est = getEstrategia();
-  document.getElementById('aportImporte').value = est.capitalTotal / est.plazoMeses;
+  document.getElementById('aportImporte').value = sumaDcaMensual;
   document.getElementById('modalAportacion').classList.add('open');
 }
 
@@ -898,3 +933,45 @@ renderAll();
 const firebaseConfig = {
   apiKey: "AIzaSyBIGxH45LosTNGGyuauOCrvHttYxs7AuCI",
   authDomain: "mis-finanzas-85c47.firebaseapp.com",
+  projectId: "mis-finanzas-85c47",
+  storageBucket: "mis-finanzas-85c47.firebasestorage.app",
+  messagingSenderId: "584441374984",
+  appId: "1:584441374984:web:1d4114361bd5994a2264bd"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const DOC_REF = db.collection('usuarios').doc('miquel_portfolio');
+let _syncBlocked = false;
+
+function setSyncStatus(estado) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (estado === 'ok') { el.textContent = '☁️ Sincronizado'; el.style.color = '#2ECC71'; }
+  if (estado === 'saving') { el.textContent = '⏳ Guardando...'; el.style.color = '#F39C12'; }
+  if (estado === 'error') { el.textContent = '⚠️ Sin conexión'; el.style.color = '#E74C3C'; }
+}
+
+function saveDataCloud(d) {
+  saveDataLocal(d);
+  setSyncStatus('saving');
+  _syncBlocked = true;
+  DOC_REF.set({ data: JSON.stringify(d), ts: Date.now() })
+    .then(() => { setSyncStatus('ok'); setTimeout(() => { _syncBlocked = false; }, 1000); })
+    .catch(() => { setSyncStatus('error'); _syncBlocked = false; });
+}
+window.saveDataCloud = saveDataCloud;
+
+DOC_REF.onSnapshot(snap => {
+  if (_syncBlocked) return;
+  if (snap.exists) {
+    try {
+      const remoteData = JSON.parse(snap.data().data);
+      saveDataLocal(remoteData);
+      if (typeof renderAll === 'function') renderAll();
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  }
+}, () => { setSyncStatus('error'); });
+</script>
+</body>
+</html>
